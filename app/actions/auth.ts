@@ -109,6 +109,7 @@ export async function signIn(prevState: any, formData: FormData) {
         }
 
         await createSession(user.id, user.role)
+        console.log("Session created for user:", user.email)
 
     } catch (error) {
         console.error("Sign in error:", error)
@@ -117,6 +118,7 @@ export async function signIn(prevState: any, formData: FormData) {
         }
     }
 
+    console.log("Redirecting to dashboard...")
     redirect('/dashboard')
 }
 
