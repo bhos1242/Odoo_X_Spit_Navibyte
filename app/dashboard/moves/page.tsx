@@ -5,9 +5,10 @@ import { MovesContainer } from "@/components/inventory/moves-container";
 export default async function StockMovesPage({
   searchParams,
 }: {
-  searchParams: { query?: string };
+  searchParams: Promise<{ query?: string }>;
 }) {
-  const query = searchParams?.query || "";
+  const params = await searchParams;
+  const query = params?.query || "";
   const { data: moves } = await getStockMoves(query);
 
   return (
