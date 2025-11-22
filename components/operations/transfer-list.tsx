@@ -11,10 +11,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { Check, Trash2 } from "lucide-react";
-import { deleteTransfer, validateTransfer } from "@/app/actions/operation";
+import { Check, Trash2, Calendar, Package } from "lucide-react";
+import { deleteTransfer, validateTransfer, getTransfers } from "@/app/actions/operation";
 import toast from "react-hot-toast";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,10 +44,20 @@ interface TransferListProps {
   type: "INCOMING" | "OUTGOING" | "INTERNAL" | "ADJUSTMENT";
 }
 
-export function TransferList({ transfers, type }: TransferListProps) {
+export function TransferList({ transfers: initialTransfers, type }: TransferListProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [validatingId, setValidatingId] = useState<string | null>(null);
   const queryClient = useQueryClient();
+
+  const { data: transfers = [] } = useQuery({
+    queryKey: ["transfers", type],
+    queryFn: async () => {
+      const res = await getTransfers(type);
+      if (!res.success) throw new Error(res.error as string);
+      return res.data as Transfer[];
+    },
+    initialData: initialTransfers,
+  });
 
   const deleteMutation = useMutation({
     mutationFn: deleteTransfer,
@@ -97,6 +107,8 @@ export function TransferList({ transfers, type }: TransferListProps) {
               <TableHead>Contact</TableHead>
               <TableHead>Source</TableHead>
               <TableHead>Destination</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Items</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -105,7 +117,7 @@ export function TransferList({ transfers, type }: TransferListProps) {
             {transfers.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={6}
+                  colSpan={8}
                   className="text-center text-muted-foreground"
                 >
                   No transfers found.
@@ -121,6 +133,22 @@ export function TransferList({ transfers, type }: TransferListProps) {
                   <TableCell>{transfer.sourceLocation?.name || "-"}</TableCell>
                   <TableCell>
                     {transfer.destinationLocation?.name || "-"}
+                  </TableCell>
+                  <TableCell>
+                    {transfer.scheduledDate ? (
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <Calendar className="mr-2 h-3 w-3" />
+                        {format(new Date(transfer.scheduledDate), "PP")}
+                      </div>
+                    ) : (
+                      "-"
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <Package className="mr-2 h-3 w-3" />
+                      {transfer.stockMoves.length}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Badge
