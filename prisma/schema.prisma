@@ -87,6 +87,7 @@ model Product {
 model Warehouse {
   id        String     @id @default(cuid())
   name      String
+  shortCode String     @unique // e.g. WH
   address   String?
   locations Location[]
   createdAt DateTime   @default(now())
@@ -106,6 +107,7 @@ enum LocationType {
 model Location {
   id          String       @id @default(cuid())
   name        String
+  shortCode   String       @unique // e.g. WH/STOCK
   type        LocationType @default(INTERNAL)
   
   // Hierarchy: Parent Location (e.g., Warehouse -> Zone -> Rack -> Shelf)

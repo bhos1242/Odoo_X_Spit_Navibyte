@@ -13,6 +13,7 @@ import { MapPin, Box } from "lucide-react";
 interface Warehouse {
   id: string;
   name: string;
+  shortCode: string;
   address: string | null;
   locations: any[];
 }
@@ -38,6 +39,7 @@ export function WarehouseList({ warehouses }: { warehouses: Warehouse[] }) {
                 <Box className="h-5 w-5 text-primary" />
                 {warehouse.name}
               </span>
+              <Badge variant="outline">{warehouse.shortCode}</Badge>
             </CardTitle>
             <CardDescription className="flex items-center gap-1">
               <MapPin className="h-3 w-3" />

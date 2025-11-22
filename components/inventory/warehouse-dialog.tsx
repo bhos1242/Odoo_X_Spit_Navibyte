@@ -29,6 +29,7 @@ import { Plus } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
+  shortCode: z.string().min(2, "Short code must be at least 2 characters").max(5, "Keep it short (max 5 chars)"),
   address: z.string().optional(),
 });
 
@@ -38,6 +39,7 @@ export function WarehouseDialog() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
+      shortCode: "",
       address: "",
     },
   });
@@ -78,6 +80,19 @@ export function WarehouseDialog() {
                   <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input placeholder="Main Warehouse" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="shortCode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Short Code</FormLabel>
+                  <FormControl>
+                    <Input placeholder="WH" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
