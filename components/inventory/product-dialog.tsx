@@ -31,10 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  createProduct,
-  updateProduct,
-} from "@/app/actions/product";
+import { createProduct, updateProduct } from "@/app/actions/product";
 import { getCategories } from "@/app/actions/category";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
