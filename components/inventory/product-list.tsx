@@ -19,8 +19,9 @@ import {
 import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { ProductDialog } from "./product-dialog";
-import { deleteProduct } from "@/app/actions/product";
-import { toast } from "sonner";
+import { deleteProduct, getProducts } from "@/app/actions/product";
+import toast from "react-hot-toast";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,18 +50,39 @@ interface ProductListProps {
   products: Product[];
 }
 
-export function ProductList({ products }: ProductListProps) {
+export function ProductList({ products: initialProducts }: ProductListProps) {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+
+  const { data: products = [] } = useQuery({
+    queryKey: ["products"],
+    queryFn: async () => {
+      const res = await getProducts();
+      if (!res.success) throw new Error(res.error as string);
+      return (res.data || []) as unknown as Product[];
+    },
+    initialData: initialProducts,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteProduct,
+    onSuccess: (result) => {
+      if (result.success) {
+        toast.success("Product deleted successfully");
+        queryClient.invalidateQueries({ queryKey: ["products"] });
+      } else {
+        toast.error("Failed to delete product");
+      }
+    },
+    onError: () => {
+      toast.error("Failed to delete product");
+    },
+  });
 
   const handleDelete = async () => {
     if (!deletingId) return;
-    const result = await deleteProduct(deletingId);
-    if (result.success) {
-      toast.success("Product deleted successfully");
-    } else {
-      toast.error("Failed to delete product");
-    }
+    deleteMutation.mutate(deletingId);
     setDeletingId(null);
   };
 

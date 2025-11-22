@@ -37,7 +37,7 @@ import {
   getCategories,
 } from "@/app/actions/category";
 import { Plus } from "lucide-react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const categorySchema = z.object({

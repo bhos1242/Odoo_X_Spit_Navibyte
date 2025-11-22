@@ -34,8 +34,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { createProduct, updateProduct } from "@/app/actions/product";
 import { getCategories } from "@/app/actions/category";
 import { Plus } from "lucide-react";
-import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const productSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -63,6 +63,7 @@ export function ProductDialog({
   productToEdit,
 }: ProductDialogProps = {}) {
   const [internalOpen, setInternalOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setOpen = controlledOnOpenChange || setInternalOpen;
@@ -75,6 +76,45 @@ export function ProductDialog({
       return res.data || [];
     },
     enabled: isOpen,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: createProduct,
+    onSuccess: (result) => {
+      if (result.success) {
+        setOpen(false);
+        form.reset();
+        toast.success("Product created");
+        queryClient.invalidateQueries({ queryKey: ["products"] });
+      } else {
+        toast.error("Failed to create product");
+        console.error(result.error);
+      }
+    },
+    onError: (error) => {
+      toast.error("Failed to create product");
+      console.error(error);
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      updateProduct(id, data),
+    onSuccess: (result) => {
+      if (result.success) {
+        setOpen(false);
+        form.reset();
+        toast.success("Product updated");
+        queryClient.invalidateQueries({ queryKey: ["products"] });
+      } else {
+        toast.error("Failed to update product");
+        console.error(result.error);
+      }
+    },
+    onError: (error) => {
+      toast.error("Failed to update product");
+      console.error(error);
+    },
   });
 
   const form = useForm({
@@ -125,22 +165,10 @@ export function ProductDialog({
   }, [productToEdit, form, isOpen]);
 
   async function onSubmit(values: z.infer<typeof productSchema>) {
-    let result;
     if (productToEdit) {
-      result = await updateProduct(productToEdit.id, values);
+      updateMutation.mutate({ id: productToEdit.id, data: values });
     } else {
-      result = await createProduct(values);
-    }
-
-    if (result.success) {
-      setOpen(false);
-      form.reset();
-      toast.success(productToEdit ? "Product updated" : "Product created");
-    } else {
-      toast.error(
-        productToEdit ? "Failed to update product" : "Failed to create product"
-      );
-      console.error(result.error);
+      createMutation.mutate(values);
     }
   }
 

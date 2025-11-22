@@ -21,7 +21,7 @@ import {
 import { MoreHorizontal, Pencil, Trash, Search } from "lucide-react";
 import { CategoryDialog } from "./category-dialog";
 import { deleteCategory, getCategories } from "@/app/actions/category";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { Category } from "@/app/actions/category";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
