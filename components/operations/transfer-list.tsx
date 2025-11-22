@@ -137,7 +137,12 @@ export function TransferList({
               transfers.map((transfer) => (
                 <TableRow key={transfer.id}>
                   <TableCell className="font-medium">
-                    {transfer.reference}
+                    <Link
+                      href={`/dashboard/operations/receipts/${transfer.id}`}
+                      className="hover:underline text-primary"
+                    >
+                      {transfer.reference}
+                    </Link>
                   </TableCell>
                   <TableCell>{transfer.contact?.name || "-"}</TableCell>
                   <TableCell>{transfer.sourceLocation?.name || "-"}</TableCell>
