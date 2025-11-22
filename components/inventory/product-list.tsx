@@ -32,6 +32,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Product {
   id: string;
@@ -120,6 +126,13 @@ export function ProductList({ products: initialProducts }: ProductListProps) {
                   }
                   return acc;
                 }, 0);
+
+                const stockBreakdown = product.stockLevels.map((sl) => ({
+                    name: sl.location?.name || "Unknown",
+                    type: sl.location?.type || "Unknown",
+                    qty: sl.quantity
+                }));
+
                 return (
                   <TableRow key={product.id}>
                     <TableCell className="font-medium">
@@ -137,11 +150,33 @@ export function ProductList({ products: initialProducts }: ProductListProps) {
                       ${Number(product.costPrice).toFixed(2)}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Badge
-                        variant={totalStock > 0 ? "outline" : "destructive"}
-                      >
-                        {totalStock} Units
-                      </Badge>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <Badge
+                              variant={totalStock > 0 ? "outline" : "destructive"}
+                              className="cursor-help"
+                            >
+                              {totalStock} Units
+                            </Badge>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <div className="text-xs">
+                                <p className="font-semibold mb-1">Stock Breakdown:</p>
+                                {stockBreakdown.length === 0 ? (
+                                    <p>No stock records</p>
+                                ) : (
+                                    stockBreakdown.map((item, idx) => (
+                                        <div key={idx} className="flex justify-between gap-4">
+                                            <span>{item.name} ({item.type}):</span>
+                                            <span>{item.qty}</span>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>
