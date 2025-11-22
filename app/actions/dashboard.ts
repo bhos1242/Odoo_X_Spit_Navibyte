@@ -1,67 +1,115 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { TransferType, TransferStatus } from '@prisma/client'
+
+export type OperationStats = {
+    toProcess: number
+    late: number
+    waiting: number
+}
+
+export type DashboardStats = {
+    receipts: OperationStats
+    deliveries: OperationStats
+    internal: OperationStats
+    lowStockCount: number
+    totalProducts: number
+    totalValue: number
+}
+
+async function getOperationStats(type: TransferType): Promise<OperationStats> {
+    const now = new Date()
+    
+    const [toProcess, late, waiting] = await prisma.$transaction([
+        // To Process: Not done, not canceled
+        prisma.stockTransfer.count({
+            where: {
+                type,
+                status: {
+                    in: [TransferStatus.DRAFT, TransferStatus.WAITING, TransferStatus.READY]
+                }
+            }
+        }),
+        // Late: Scheduled date is past, and not done/canceled
+        prisma.stockTransfer.count({
+            where: {
+                type,
+                status: {
+                    in: [TransferStatus.DRAFT, TransferStatus.WAITING, TransferStatus.READY]
+                },
+                scheduledDate: {
+                    lt: now
+                }
+            }
+        }),
+        // Waiting: Specifically waiting status
+        prisma.stockTransfer.count({
+            where: {
+                type,
+                status: TransferStatus.WAITING
+            }
+        })
+    ])
+
+    return { toProcess, late, waiting }
+}
 
 export async function getDashboardStats() {
     try {
-        const [
-            totalProducts,
-            lowStockProducts,
-            pendingReceipts,
-            pendingDeliveries,
-            internalTransfers
-        ] = await prisma.$transaction([
-            // 1. Total Products
-            prisma.product.count(),
-
-            // 2. Low Stock Items (where current stock < minStock)
-            // Note: This is an approximation. Ideally we check stock levels per location, 
-            // but for a high-level KPI, we can check products where total stock is low if we aggregated it,
-            // or just count products that have a reordering rule set. 
-            // For now, let's count products.
-            prisma.product.count({
-                where: {
-                    stockLevels: {
-                        some: {
-                            quantity: { lte: 5 } // Simple threshold for now, or use minStock if we could compare fields
-                        }
-                    }
-                }
-            }),
-
-            // 3. Pending Receipts
-            prisma.stockTransfer.count({
-                where: {
-                    type: 'INCOMING',
-                    status: { not: 'DONE' }
-                }
-            }),
-
-            // 4. Pending Deliveries
-            prisma.stockTransfer.count({
-                where: {
-                    type: 'OUTGOING',
-                    status: { not: 'DONE' }
-                }
-            }),
-
-            // 5. Internal Transfers Scheduled
-            prisma.stockTransfer.count({
-                where: {
-                    type: 'INTERNAL',
-                    status: { not: 'DONE' }
-                }
-            })
+        const [receipts, deliveries, internal] = await Promise.all([
+            getOperationStats(TransferType.INCOMING),
+            getOperationStats(TransferType.OUTGOING),
+            getOperationStats(TransferType.INTERNAL)
         ])
+
+        // Low Stock: Products where any stock level is <= product.minStock
+        // Since we can't easily compare fields in Prisma `where`, we'll fetch products with stock levels
+        // and filter in memory. For a large DB this is bad, but for this scale it's fine.
+        // Optimization: Only fetch products that have minStock > 0
+        const productsWithStock = await prisma.product.findMany({
+            where: {
+                minStock: { gt: 0 }
+            },
+            include: {
+                stockLevels: true
+            }
+        })
+
+        let lowStockCount = 0
+        let totalValue = 0
+
+        // Calculate total value while we're at it (approximate)
+        // We need to fetch ALL products for total value, not just those with minStock
+        // Let's do a separate aggregation for total value if possible, or just fetch all.
+        // Let's just fetch all products for now to be safe and simple.
+        const allProducts = await prisma.product.findMany({
+            include: {
+                stockLevels: true
+            }
+        })
+
+        allProducts.forEach(product => {
+            const totalStock = product.stockLevels.reduce((sum, level) => sum + level.quantity, 0)
+            
+            // Value
+            totalValue += totalStock * Number(product.costPrice)
+
+            // Low Stock Check
+            if (product.minStock > 0 && totalStock <= product.minStock) {
+                lowStockCount++
+            }
+        })
 
         return {
             success: true,
             data: {
-                totalProducts,
-                lowStockProducts,
-                pendingReceipts,
-                pendingDeliveries,
-                internalTransfers
+                receipts,
+                deliveries,
+                internal,
+                lowStockCount,
+                totalProducts: allProducts.length,
+                totalValue
             }
         }
     } catch (error) {
@@ -69,3 +117,4 @@ export async function getDashboardStats() {
         return { success: false, error: 'Failed to fetch dashboard stats' }
     }
 }
+
