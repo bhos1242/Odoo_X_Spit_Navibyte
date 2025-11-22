@@ -1,11 +1,16 @@
 import { getStockMoves } from "@/app/actions/stock";
-import { MovesTable } from "@/components/inventory/moves-table";
+import { MovesContainer } from "@/components/inventory/moves-container";
 
-export default async function StockMovesPage() {
-  const { data: moves } = await getStockMoves();
+export default async function StockMovesPage({
+  searchParams,
+}: {
+  searchParams: { query?: string };
+}) {
+  const query = searchParams?.query || "";
+  const { data: moves } = await getStockMoves(query);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-8 pt-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
           Stock Moves History
@@ -15,7 +20,7 @@ export default async function StockMovesPage() {
         </p>
       </div>
 
-      <MovesTable moves={moves || []} />
+      <MovesContainer moves={moves || []} />
     </div>
   );
 }

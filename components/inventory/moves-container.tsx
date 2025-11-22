@@ -5,12 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  LayoutGrid,
-  LayoutList,
-  Plus,
-  Search,
-} from "lucide-react";
+import { LayoutGrid, LayoutList, Plus, Search } from "lucide-react";
 import { MovesTable } from "./moves-table";
 import { MovesKanban } from "./moves-kanban";
 
