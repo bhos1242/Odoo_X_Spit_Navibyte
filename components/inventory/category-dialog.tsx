@@ -38,6 +38,7 @@ import {
 } from "@/app/actions/category";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const categorySchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -57,7 +58,7 @@ export function CategoryDialog({
   categoryToEdit,
 }: CategoryDialogProps = {}) {
   const [internalOpen, setInternalOpen] = useState(false);
-  const [categories, setCategories] = useState<any[]>([]);
+  const queryClient = useQueryClient();
 
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setOpen = controlledOnOpenChange || setInternalOpen;
@@ -71,19 +72,21 @@ export function CategoryDialog({
     },
   });
 
-  useEffect(() => {
-    if (isOpen) {
-      getCategories().then((res) => {
-        if (res.success) {
-          // Filter out the category itself to prevent circular dependency if editing
-          const availableCategories = res.data?.filter(
-            (c) => !categoryToEdit || c.id !== categoryToEdit.id
-          );
-          setCategories(availableCategories || []);
-        }
-      });
-    }
-  }, [isOpen, categoryToEdit]);
+  // Use TanStack Query for fetching categories
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const res = await getCategories();
+      if (!res.success) throw new Error(res.error as string);
+      return res.data || [];
+    },
+    enabled: isOpen, // Only fetch when dialog is open
+  });
+
+  // Filter out the category itself to prevent circular dependency if editing
+  const availableCategories = categories.filter(
+    (c) => !categoryToEdit || c.id !== categoryToEdit.id
+  );
 
   useEffect(() => {
     if (categoryToEdit) {
@@ -101,30 +104,55 @@ export function CategoryDialog({
     }
   }, [categoryToEdit, form, isOpen]);
 
+  const createMutation = useMutation({
+    mutationFn: createCategory,
+    onSuccess: (result) => {
+      if (result.success) {
+        setOpen(false);
+        form.reset();
+        toast.success("Category created");
+        queryClient.invalidateQueries({ queryKey: ["categories"] });
+      } else {
+        toast.error("Failed to create category");
+        console.error(result.error);
+      }
+    },
+    onError: (error) => {
+      toast.error("Failed to create category");
+      console.error(error);
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      updateCategory(id, data),
+    onSuccess: (result) => {
+      if (result.success) {
+        setOpen(false);
+        form.reset();
+        toast.success("Category updated");
+        queryClient.invalidateQueries({ queryKey: ["categories"] });
+      } else {
+        toast.error("Failed to update category");
+        console.error(result.error);
+      }
+    },
+    onError: (error) => {
+      toast.error("Failed to update category");
+      console.error(error);
+    },
+  });
+
   async function onSubmit(values: z.infer<typeof categorySchema>) {
-    let result;
     const data = {
       ...values,
       parentId: values.parentId === "none" ? undefined : values.parentId,
     };
 
     if (categoryToEdit) {
-      result = await updateCategory(categoryToEdit.id, data);
+      updateMutation.mutate({ id: categoryToEdit.id, data });
     } else {
-      result = await createCategory(data);
-    }
-
-    if (result.success) {
-      setOpen(false);
-      form.reset();
-      toast.success(categoryToEdit ? "Category updated" : "Category created");
-    } else {
-      toast.error(
-        categoryToEdit
-          ? "Failed to update category"
-          : "Failed to create category"
-      );
-      console.error(result.error);
+      createMutation.mutate(data);
     }
   }
 
@@ -182,7 +210,7 @@ export function CategoryDialog({
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="none">None</SelectItem>
-                      {categories.map((cat) => (
+                      {availableCategories.map((cat) => (
                         <SelectItem key={cat.id} value={cat.id}>
                           {cat.name}
                         </SelectItem>

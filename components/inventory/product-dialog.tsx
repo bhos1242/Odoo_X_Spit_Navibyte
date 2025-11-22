@@ -35,6 +35,7 @@ import { createProduct, updateProduct } from "@/app/actions/product";
 import { getCategories } from "@/app/actions/category";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
 const productSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -62,10 +63,19 @@ export function ProductDialog({
   productToEdit,
 }: ProductDialogProps = {}) {
   const [internalOpen, setInternalOpen] = useState(false);
-  const [categories, setCategories] = useState<any[]>([]);
 
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setOpen = controlledOnOpenChange || setInternalOpen;
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const res = await getCategories();
+      if (!res.success) throw new Error(res.error as string);
+      return res.data || [];
+    },
+    enabled: isOpen,
+  });
 
   const form = useForm({
     resolver: zodResolver(productSchema),
@@ -82,14 +92,6 @@ export function ProductDialog({
       minStock: 0,
     },
   });
-
-  useEffect(() => {
-    if (isOpen) {
-      getCategories().then((res) => {
-        if (res.success) setCategories(res.data || []);
-      });
-    }
-  }, [isOpen]);
 
   useEffect(() => {
     if (productToEdit) {
