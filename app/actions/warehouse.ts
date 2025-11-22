@@ -48,11 +48,11 @@ export async function createWarehouse(data: z.infer<typeof warehouseSchema>) {
 // --- Locations ---
 
 const locationSchema = z.object({
-  name: z.string().min(2, "Name is required"),
-  shortCode: z.string().min(2, "Short code is required"),
-  type: z.enum(['VIEW', 'INTERNAL', 'CUSTOMER', 'VENDOR', 'INVENTORY_LOSS', 'PRODUCTION', 'TRANSIT']),
-  warehouseId: z.string().optional(),
-  parentId: z.string().optional(),
+    name: z.string().min(2, "Name is required"),
+    shortCode: z.string().min(2, "Short code is required"),
+    type: z.enum(['VIEW', 'INTERNAL', 'CUSTOMER', 'VENDOR', 'INVENTORY_LOSS', 'PRODUCTION', 'TRANSIT']),
+    warehouseId: z.string().optional(),
+    parentId: z.string().optional(),
 })
 export async function getLocations(warehouseId?: string) {
     try {

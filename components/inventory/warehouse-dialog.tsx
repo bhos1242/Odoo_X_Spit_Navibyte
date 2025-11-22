@@ -29,7 +29,10 @@ import { Plus } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
-  shortCode: z.string().min(2, "Short code must be at least 2 characters").max(5, "Keep it short (max 5 chars)"),
+  shortCode: z
+    .string()
+    .min(2, "Short code must be at least 2 characters")
+    .max(5, "Keep it short (max 5 chars)"),
   address: z.string().optional(),
 });
 
