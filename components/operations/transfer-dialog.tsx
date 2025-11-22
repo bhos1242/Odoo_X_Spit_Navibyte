@@ -30,11 +30,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { createTransfer } from "@/app/actions/operation";
 import { getContacts } from "@/app/actions/contact";
 import { getLocations } from "@/app/actions/warehouse";
 import { getProducts } from "@/app/actions/product";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -173,7 +174,7 @@ export function TransferDialog({
           </Button>
         </DialogTrigger>
       )}
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
@@ -181,8 +182,9 @@ export function TransferDialog({
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* General Info Section */}
+            <div className="grid gap-6">
               <FormField
                 control={form.control}
                 name="contactId"
@@ -212,68 +214,71 @@ export function TransferDialog({
                   </FormItem>
                 )}
               />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="sourceLocationId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Source Location</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select source" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {locations?.map((l) => (
+                            <SelectItem key={l.id} value={l.id}>
+                              {l.name} ({l.shortCode})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="destinationLocationId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Destination Location</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select destination" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {locations?.map((l) => (
+                            <SelectItem key={l.id} value={l.id}>
+                              {l.name} ({l.shortCode})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="sourceLocationId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Source Location</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select source" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {locations?.map((l) => (
-                          <SelectItem key={l.id} value={l.id}>
-                            {l.name} ({l.shortCode})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="destinationLocationId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Destination Location</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select destination" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {locations?.map((l) => (
-                          <SelectItem key={l.id} value={l.id}>
-                            {l.name} ({l.shortCode})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <Separator />
 
-            <div className="space-y-2">
+            {/* Products Section */}
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <FormLabel>Products</FormLabel>
+                <FormLabel className="text-base font-semibold">Products</FormLabel>
                 <Button
                   type="button"
                   variant="outline"
@@ -285,65 +290,74 @@ export function TransferDialog({
                 </Button>
               </div>
 
-              {fields.map((field, index) => (
-                <div key={field.id} className="flex items-end gap-2">
-                  <FormField
-                    control={form.control}
-                    name={`items.${index}.productId`}
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
+              <div className="space-y-4">
+                {fields.map((field, index) => (
+                  <div key={field.id} className="flex items-start gap-4 p-4 border rounded-lg bg-muted/20">
+                    <FormField
+                      control={form.control}
+                      name={`items.${index}.productId`}
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormLabel className={index !== 0 ? "sr-only" : ""}>Product</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select product" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {products?.map((p) => (
+                                <SelectItem key={p.id} value={p.id}>
+                                  {p.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`items.${index}.quantity`}
+                      render={({ field }) => (
+                        <FormItem className="w-32">
+                          <FormLabel className={index !== 0 ? "sr-only" : ""}>Quantity</FormLabel>
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select product" />
-                            </SelectTrigger>
+                            <Input
+                              type="number"
+                              min="1"
+                              {...field}
+                              value={field.value as number}
+                            />
                           </FormControl>
-                          <SelectContent>
-                            {products?.map((p) => (
-                              <SelectItem key={p.id} value={p.id}>
-                                {p.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`items.${index}.quantity`}
-                    render={({ field }) => (
-                      <FormItem className="w-24">
-                        <FormControl>
-                          <Input
-                            type="number"
-                            min="1"
-                            {...field}
-                            value={field.value as number}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => remove(index)}
-                    disabled={fields.length === 1}
-                  >
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
-                </div>
-              ))}
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className={index === 0 ? "pt-8" : "pt-0"}>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => remove(index)}
+                        disabled={fields.length === 1}
+                        className="text-muted-foreground hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
               <FormMessage>{form.formState.errors.items?.message}</FormMessage>
             </div>
 
             <DialogFooter>
-              <Button type="submit">Create Transfer</Button>
+              <Button type="submit" className="w-full sm:w-auto">Create Transfer</Button>
             </DialogFooter>
           </form>
         </Form>
