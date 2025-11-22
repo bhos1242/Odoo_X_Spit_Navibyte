@@ -80,11 +80,11 @@ export function ForgotPasswordForm() {
         });
       } else if (result?.message) {
         if (result.success) {
-            toast.success(result.message);
-            setEmail(values.email);
-            setStep("OTP");
+          toast.success(result.message);
+          setEmail(values.email);
+          setStep("OTP");
         } else {
-            toast.error(result.message);
+          toast.error(result.message);
         }
       }
     });
@@ -106,10 +106,10 @@ export function ForgotPasswordForm() {
         });
       } else if (result?.message) {
         if (result.success) {
-            toast.success(result.message);
-            router.push("/sign-in");
+          toast.success(result.message);
+          router.push("/sign-in");
         } else {
-            toast.error(result.message);
+          toast.error(result.message);
         }
       }
     });

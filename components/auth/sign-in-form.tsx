@@ -106,6 +106,14 @@ export function SignInForm() {
             <Button type="submit" className="w-full" disabled={isPending}>
               {isPending ? "Signing in..." : "Sign In"}
             </Button>
+            <div className="text-center">
+              <Link
+                href="/forgot-password"
+                className="text-sm text-muted-foreground hover:text-primary hover:underline"
+              >
+                Forgot your password?
+              </Link>
+            </div>
           </form>
         </Form>
       </CardContent>
