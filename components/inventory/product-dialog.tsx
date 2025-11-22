@@ -70,14 +70,14 @@ export function ProductDialog({
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setOpen = controlledOnOpenChange || setInternalOpen;
 
-  const form = useForm<z.infer<typeof productSchema>>({
+  const form = useForm({
     resolver: zodResolver(productSchema),
     defaultValues: {
       name: "",
       sku: "",
       barcode: "",
       description: "",
-      type: "STORABLE",
+      type: "STORABLE" as const,
       unitOfMeasure: "Units",
       costPrice: 0,
       salesPrice: 0,
