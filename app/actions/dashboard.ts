@@ -20,7 +20,7 @@ export type DashboardStats = {
 
 async function getOperationStats(type: TransferType): Promise<OperationStats> {
     const now = new Date()
-    
+
     const [toProcess, late, waiting] = await prisma.$transaction([
         // To Process: Not done, not canceled
         prisma.stockTransfer.count({
@@ -91,7 +91,7 @@ export async function getDashboardStats() {
 
         allProducts.forEach(product => {
             const totalStock = product.stockLevels.reduce((sum, level) => sum + level.quantity, 0)
-            
+
             // Value
             totalValue += totalStock * Number(product.costPrice)
 
