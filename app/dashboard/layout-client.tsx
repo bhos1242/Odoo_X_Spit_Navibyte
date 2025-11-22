@@ -22,7 +22,7 @@ export default function DashboardLayoutClient({
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40 md:flex-row">
       {/* Desktop Sidebar */}
-      <aside className="hidden w-64 flex-col md:flex">
+      <aside className="hidden w-64 flex-col md:flex shrink-0">
         <Sidebar />
       </aside>
 
@@ -44,12 +44,12 @@ export default function DashboardLayoutClient({
         <Sidebar />
       </div>
 
-      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14 md:pl-0 w-full">
+      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14 md:pl-0 flex-1 min-w-0">
         <Header
           user={user}
           onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)}
         />
-        <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+        <main className="flex flex-col flex-1 gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 min-w-0">
           {children}
         </main>
       </div>

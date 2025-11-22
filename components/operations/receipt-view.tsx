@@ -280,7 +280,7 @@ export function ReceiptView({ transfer }: ReceiptViewProps) {
         </div>
 
         {/* Table */}
-        <div className="rounded-lg border border-gray-200 overflow-hidden mb-8">
+        <div className="rounded-lg border border-gray-200 overflow-x-auto mb-8">
           <Table>
             <TableHeader className="bg-gray-50">
               <TableRow>
