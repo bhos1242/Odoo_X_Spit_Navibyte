@@ -20,19 +20,45 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Pencil, Trash, Search } from "lucide-react";
 import { CategoryDialog } from "./category-dialog";
-import { deleteCategory } from "@/app/actions/category";
+import { deleteCategory, getCategories } from "@/app/actions/category";
 import { toast } from "sonner";
 import { Category } from "@/app/actions/category";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface CategoryListProps {
   initialCategories: Category[];
 }
 
 export function CategoryList({ initialCategories }: CategoryListProps) {
-  const [categories, setCategories] = useState(initialCategories);
   const [searchQuery, setSearchQuery] = useState("");
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const res = await getCategories();
+      if (!res.success) throw new Error(res.error as string);
+      return res.data || [];
+    },
+    initialData: initialCategories,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteCategory,
+    onSuccess: (result) => {
+      if (result.success) {
+        toast.success("Category deleted");
+        queryClient.invalidateQueries({ queryKey: ["categories"] });
+      } else {
+        toast.error("Failed to delete category");
+      }
+    },
+    onError: () => {
+      toast.error("Failed to delete category");
+    },
+  });
 
   const filteredCategories = categories.filter((category) =>
     category.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -40,17 +66,7 @@ export function CategoryList({ initialCategories }: CategoryListProps) {
 
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this category?")) {
-      const result = await deleteCategory(id);
-      if (result.success) {
-        toast.success("Category deleted");
-        // Optimistic update or router refresh could be used here
-        // For now, we rely on the parent page to refresh or we can update local state if we want
-        // But since we used revalidatePath in the action, a router.refresh() in the parent or here would be better.
-        // However, since this is a client component receiving props, we might need to refresh the page.
-        window.location.reload();
-      } else {
-        toast.error("Failed to delete category");
-      }
+      deleteMutation.mutate(id);
     }
   };
 
