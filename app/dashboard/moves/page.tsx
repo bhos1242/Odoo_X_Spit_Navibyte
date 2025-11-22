@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getStockMoves } from "@/app/actions/stock";
 import { MovesContainer } from "@/components/inventory/moves-container";
 
@@ -20,7 +21,9 @@ export default async function StockMovesPage({
         </p>
       </div>
 
-      <MovesContainer moves={moves || []} />
+      <Suspense fallback={<div>Loading moves...</div>}>
+        <MovesContainer moves={moves || []} />
+      </Suspense>
     </div>
   );
 }
