@@ -20,9 +20,13 @@ import {
   ShoppingCart,
   ArrowDownToLine,
   ArrowUpFromLine,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { useState, useEffect } from "react";
+import { signOut } from "@/app/actions/auth";
 
 const sidebarGroups = [
   {
@@ -122,9 +126,72 @@ const sidebarGroups = [
   },
 ];
 
-import { signOut } from "@/app/actions/auth";
-
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+function SidebarGroup({
+  group,
+  pathname,
+}: {
+  group: (typeof sidebarGroups)[0];
+  pathname: string;
+}) {
+  const isActiveGroup = group.items.some((item) => item.href === pathname);
+  const [isOpen, setIsOpen] = useState(true);
+
+  // Auto-open if a child is active, but allow manual toggle
+  useEffect(() => {
+    if (isActiveGroup) {
+      setIsOpen(true);
+    }
+  }, [isActiveGroup]);
+
+  return (
+    <div className="px-3 py-2">
+      <Button
+        variant="ghost"
+        className="w-full justify-between hover:bg-transparent hover:text-primary p-0 h-auto mb-2 px-4"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <h3 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">
+          {group.title}
+        </h3>
+        {isOpen ? (
+          <ChevronDown className="h-3 w-3 text-muted-foreground" />
+        ) : (
+          <ChevronRight className="h-3 w-3 text-muted-foreground" />
+        )}
+      </Button>
+      {isOpen && (
+        <div className="space-y-1 animate-in slide-in-from-top-1 duration-200">
+          {group.items.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Button
+                key={item.href}
+                variant={isActive ? "secondary" : "ghost"}
+                className={cn(
+                  "w-full justify-start transition-colors",
+                  isActive && "bg-secondary/50 font-medium text-primary"
+                )}
+                asChild
+              >
+                <Link href={item.href as any}>
+                  <item.icon
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      isActive ? "text-primary" : "text-muted-foreground"
+                    )}
+                  />
+                  {item.title}
+                </Link>
+              </Button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
@@ -132,54 +199,40 @@ export function Sidebar({ className }: SidebarProps) {
   return (
     <div
       className={cn(
-        "relative pb-12 min-h-screen border-r bg-background",
+        "flex flex-col h-screen border-r bg-background",
         className
       )}
     >
-      <div className="space-y-4 py-4">
-        <div className="px-3 py-2">
-          <div className="mb-6 px-4 flex items-center gap-2">
-            <div className="relative h-8 w-8">
-              <Image
-                src="/logo.png"
-                alt="IMS Logo"
-                fill
-                className="object-contain"
-              />
-            </div>
-            <h2 className="text-lg font-semibold tracking-tight">IMS</h2>
-          </div>
-          <div className="space-y-4">
-            {sidebarGroups.map((group) => (
-              <div key={group.title} className="px-3 py-2">
-                <h3 className="mb-2 px-4 text-xs font-semibold uppercase text-muted-foreground tracking-wider">
-                  {group.title}
-                </h3>
-                <div className="space-y-1">
-                  {group.items.map((item) => (
-                    <Button
-                      key={item.href}
-                      variant={pathname === item.href ? "secondary" : "ghost"}
-                      className="w-full justify-start"
-                      asChild
-                    >
-                      <Link href={item.href as any}>
-                        <item.icon className="mr-2 h-4 w-4" />
-                        {item.title}
-                      </Link>
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* Header */}
+      <div className="p-6 flex items-center gap-3 border-b">
+        <div className="relative h-8 w-8 shrink-0">
+          <Image
+            src="/logo.png"
+            alt="IMS Logo"
+            fill
+            className="object-contain"
+          />
+        </div>
+        <h2 className="text-lg font-bold tracking-tight text-foreground">
+          IMS
+        </h2>
+      </div>
+
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto py-4">
+        <div className="space-y-1">
+          {sidebarGroups.map((group) => (
+            <SidebarGroup key={group.title} group={group} pathname={pathname} />
+          ))}
         </div>
       </div>
-      <div className="absolute bottom-4 px-3 w-full">
+
+      {/* Footer */}
+      <div className="p-4 border-t bg-muted/10">
         <form action={signOut}>
           <Button
             variant="ghost"
-            className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
+            className="w-full justify-start text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
           >
             <LogOut className="mr-2 h-4 w-4" />
             Sign Out
