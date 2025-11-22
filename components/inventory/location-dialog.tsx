@@ -37,7 +37,8 @@ import {
   getLocations,
 } from "@/app/actions/warehouse";
 import { Plus } from "lucide-react";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const locationSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -77,8 +78,7 @@ export function LocationDialog({
   locationToEdit,
 }: LocationDialogProps = {}) {
   const [internalOpen, setInternalOpen] = useState(false);
-  const [warehouses, setWarehouses] = useState<any[]>([]);
-  const [locations, setLocations] = useState<any[]>([]);
+  const queryClient = useQueryClient();
 
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setOpen = controlledOnOpenChange || setInternalOpen;
@@ -92,16 +92,64 @@ export function LocationDialog({
     },
   });
 
-  useEffect(() => {
-    if (isOpen) {
-      getWarehouses().then((res) => {
-        if (res.success) setWarehouses(res.data || []);
-      });
-      getLocations().then((res) => {
-        if (res.success) setLocations(res.data || []);
-      });
-    }
-  }, [isOpen]);
+  const { data: warehouses = [] } = useQuery({
+    queryKey: ["warehouses"],
+    queryFn: async () => {
+      const res = await getWarehouses();
+      if (!res.success) throw new Error(res.error as string);
+      return res.data || [];
+    },
+    enabled: isOpen,
+  });
+
+  const { data: locations = [] } = useQuery({
+    queryKey: ["locations"],
+    queryFn: async () => {
+      const res = await getLocations();
+      if (!res.success) throw new Error(res.error as string);
+      return res.data || [];
+    },
+    enabled: isOpen,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: createLocation,
+    onSuccess: (result) => {
+      if (result.success) {
+        setOpen(false);
+        form.reset();
+        toast.success("Location created");
+        queryClient.invalidateQueries({ queryKey: ["locations"] });
+      } else {
+        toast.error("Failed to create location");
+        console.error(result.error);
+      }
+    },
+    onError: (error) => {
+      toast.error("Failed to create location");
+      console.error(error);
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      updateLocation(id, data),
+    onSuccess: (result) => {
+      if (result.success) {
+        setOpen(false);
+        form.reset();
+        toast.success("Location updated");
+        queryClient.invalidateQueries({ queryKey: ["locations"] });
+      } else {
+        toast.error("Failed to update location");
+        console.error(result.error);
+      }
+    },
+    onError: (error) => {
+      toast.error("Failed to update location");
+      console.error(error);
+    },
+  });
 
   useEffect(() => {
     if (locationToEdit) {
@@ -124,24 +172,10 @@ export function LocationDialog({
   }, [locationToEdit, form, isOpen]);
 
   async function onSubmit(values: z.infer<typeof locationSchema>) {
-    let result;
     if (locationToEdit) {
-      result = await updateLocation(locationToEdit.id, values);
+      updateMutation.mutate({ id: locationToEdit.id, data: values });
     } else {
-      result = await createLocation(values);
-    }
-
-    if (result.success) {
-      setOpen(false);
-      form.reset();
-      toast.success(locationToEdit ? "Location updated" : "Location created");
-    } else {
-      toast.error(
-        locationToEdit
-          ? "Failed to update location"
-          : "Failed to create location"
-      );
-      console.error(result.error);
+      createMutation.mutate(values);
     }
   }
 

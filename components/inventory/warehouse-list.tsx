@@ -40,7 +40,11 @@ interface Warehouse {
   locations: any[];
 }
 
-export function WarehouseList({ warehouses: initialWarehouses }: { warehouses: Warehouse[] }) {
+export function WarehouseList({
+  warehouses: initialWarehouses,
+}: {
+  warehouses: Warehouse[];
+}) {
   const [editingWarehouse, setEditingWarehouse] = useState<Warehouse | null>(
     null
   );

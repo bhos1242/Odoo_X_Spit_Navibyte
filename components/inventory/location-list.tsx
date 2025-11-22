@@ -20,8 +20,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { LocationDialog } from "./location-dialog";
-import { deleteLocation } from "@/app/actions/warehouse";
-import { toast } from "sonner";
+import { deleteLocation, getLocations } from "@/app/actions/warehouse";
+import toast from "react-hot-toast";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,18 +54,39 @@ interface LocationListProps {
   locations: Location[];
 }
 
-export function LocationList({ locations }: LocationListProps) {
+export function LocationList({ locations: initialLocations }: LocationListProps) {
   const [editingLocation, setEditingLocation] = useState<Location | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+
+  const { data: locations = [] } = useQuery({
+    queryKey: ["locations"],
+    queryFn: async () => {
+      const res = await getLocations();
+      if (!res.success) throw new Error(res.error as string);
+      return (res.data || []) as unknown as Location[];
+    },
+    initialData: initialLocations,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteLocation,
+    onSuccess: (result) => {
+      if (result.success) {
+        toast.success("Location deleted successfully");
+        queryClient.invalidateQueries({ queryKey: ["locations"] });
+      } else {
+        toast.error(result.error as string);
+      }
+    },
+    onError: () => {
+      toast.error("Failed to delete location");
+    },
+  });
 
   const handleDelete = async () => {
     if (!deletingId) return;
-    const result = await deleteLocation(deletingId);
-    if (result.success) {
-      toast.success("Location deleted successfully");
-    } else {
-      toast.error(result.error as string);
-    }
+    deleteMutation.mutate(deletingId);
     setDeletingId(null);
   };
 
