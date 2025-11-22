@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { TransferStatus, TransferType } from '@prisma/client'
+import { getSession } from '@/lib/session'
 
 const moveSchema = z.object({
     productId: z.string(),
@@ -20,8 +21,17 @@ const transferSchema = z.object({
 })
 
 export async function getTransfers(type?: TransferType) {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
     try {
-        const where = type ? { type } : {}
+        const where: any = {
+            userId: session.userId as string,
+        }
+        if (type) {
+            where.type = type
+        }
+
         const transfers = await prisma.stockTransfer.findMany({
             where,
             include: {
@@ -55,7 +65,7 @@ export async function getTransfers(type?: TransferType) {
     }
 }
 
-async function generateReference(type: TransferType) {
+async function generateReference(type: TransferType, userId: string) {
     const prefixMap = {
         INCOMING: 'WH/IN',
         OUTGOING: 'WH/OUT',
@@ -64,13 +74,20 @@ async function generateReference(type: TransferType) {
     }
     const prefix = prefixMap[type]
     const count = await prisma.stockTransfer.count({
-        where: { type }
+        where: {
+            type,
+            userId
+        }
     })
     const padding = (count + 1).toString().padStart(5, '0')
     return `${prefix}/${padding}`
 }
 
 export async function createTransfer(data: z.infer<typeof transferSchema>) {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+    const userId = session.userId as string;
+
     const validated = transferSchema.safeParse(data)
     if (!validated.success) {
         return { success: false, error: validated.error.flatten().fieldErrors }
@@ -83,7 +100,7 @@ export async function createTransfer(data: z.infer<typeof transferSchema>) {
     }
 
     try {
-        const reference = await generateReference(type)
+        const reference = await generateReference(type, userId)
 
         await prisma.stockTransfer.create({
             data: {
@@ -94,13 +111,15 @@ export async function createTransfer(data: z.infer<typeof transferSchema>) {
                 destinationLocationId,
                 scheduledDate,
                 status: 'DRAFT',
+                userId,
                 stockMoves: {
                     create: items.map(item => ({
                         productId: item.productId,
                         quantity: item.quantity,
                         sourceLocationId,
                         destinationLocationId,
-                        status: 'DRAFT'
+                        status: 'DRAFT',
+                        userId
                     }))
                 }
             }
@@ -116,9 +135,16 @@ export async function createTransfer(data: z.infer<typeof transferSchema>) {
 }
 
 export async function validateTransfer(id: string) {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+    const userId = session.userId as string;
+
     try {
         const transfer = await prisma.stockTransfer.findUnique({
-            where: { id },
+            where: {
+                id,
+                userId
+            },
             include: { stockMoves: true }
         })
 
@@ -166,7 +192,8 @@ export async function validateTransfer(id: string) {
                             data: {
                                 productId: move.productId,
                                 locationId: move.sourceLocationId,
-                                quantity: -move.quantity
+                                quantity: -move.quantity,
+                                userId
                             }
                         })
                     }
@@ -193,7 +220,8 @@ export async function validateTransfer(id: string) {
                             data: {
                                 productId: move.productId,
                                 locationId: move.destinationLocationId,
-                                quantity: move.quantity
+                                quantity: move.quantity,
+                                userId
                             }
                         })
                     }
@@ -213,8 +241,16 @@ export async function validateTransfer(id: string) {
 }
 
 export async function deleteTransfer(id: string) {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
     try {
-        await prisma.stockTransfer.delete({ where: { id } })
+        await prisma.stockTransfer.delete({
+            where: {
+                id,
+                userId: session.userId as string
+            }
+        })
         revalidatePath('/dashboard/operations/deliveries')
         revalidatePath('/dashboard/operations/receipts')
         return { success: true }

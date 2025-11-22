@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
+import { getSession } from "@/lib/session";
 
 export type Category = {
     id: string;
@@ -20,8 +21,14 @@ export type Category = {
 };
 
 export async function getCategories() {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
     try {
         const categories = await prisma.category.findMany({
+            where: {
+                userId: session.userId as string,
+            },
             include: {
                 parent: {
                     select: {
@@ -52,12 +59,16 @@ export async function createCategory(data: {
     description?: string;
     parentId?: string;
 }) {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
     try {
         const category = await prisma.category.create({
             data: {
                 name: data.name,
                 description: data.description,
                 parentId: data.parentId || null,
+                userId: session.userId as string,
             },
         });
         revalidatePath("/dashboard/categories");
@@ -84,9 +95,15 @@ export async function updateCategory(
         parentId?: string;
     }
 ) {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
     try {
         const category = await prisma.category.update({
-            where: { id },
+            where: {
+                id,
+                userId: session.userId as string,
+            },
             data: {
                 name: data.name,
                 description: data.description,
@@ -110,9 +127,15 @@ export async function updateCategory(
 }
 
 export async function deleteCategory(id: string) {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
     try {
         await prisma.category.delete({
-            where: { id },
+            where: {
+                id,
+                userId: session.userId as string,
+            },
         });
         revalidatePath("/dashboard/categories");
         return { success: true };

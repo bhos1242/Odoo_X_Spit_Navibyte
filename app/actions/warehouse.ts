@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { Prisma } from '@prisma/client'
+import { getSession } from '@/lib/session'
 
 // --- Warehouses ---
 
@@ -14,8 +15,14 @@ const warehouseSchema = z.object({
 })
 
 export async function getWarehouses() {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
     try {
         const warehouses = await prisma.warehouse.findMany({
+            where: {
+                userId: session.userId as string,
+            },
             include: {
                 locations: true,
             },
@@ -30,6 +37,9 @@ export async function getWarehouses() {
 }
 
 export async function createWarehouse(data: z.infer<typeof warehouseSchema>) {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
     const validated = warehouseSchema.safeParse(data)
     if (!validated.success) {
         return { success: false, error: validated.error.flatten().fieldErrors }
@@ -37,7 +47,10 @@ export async function createWarehouse(data: z.infer<typeof warehouseSchema>) {
 
     try {
         await prisma.warehouse.create({
-            data: validated.data,
+            data: {
+                ...validated.data,
+                userId: session.userId as string,
+            },
         })
         revalidatePath('/dashboard/warehouses')
         return { success: true }
@@ -52,6 +65,9 @@ export async function createWarehouse(data: z.infer<typeof warehouseSchema>) {
 }
 
 export async function updateWarehouse(id: string, data: z.infer<typeof warehouseSchema>) {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
     const validated = warehouseSchema.safeParse(data)
     if (!validated.success) {
         return { success: false, error: validated.error.flatten().fieldErrors }
@@ -59,7 +75,10 @@ export async function updateWarehouse(id: string, data: z.infer<typeof warehouse
 
     try {
         await prisma.warehouse.update({
-            where: { id },
+            where: {
+                id,
+                userId: session.userId as string,
+            },
             data: validated.data,
         })
         revalidatePath('/dashboard/warehouses')
@@ -75,10 +94,16 @@ export async function updateWarehouse(id: string, data: z.infer<typeof warehouse
 }
 
 export async function deleteWarehouse(id: string) {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
     try {
         // Check for locations
         const warehouse = await prisma.warehouse.findUnique({
-            where: { id },
+            where: {
+                id,
+                userId: session.userId as string,
+            },
             include: { locations: true },
         })
 
@@ -95,7 +120,10 @@ export async function deleteWarehouse(id: string) {
         }
 
         await prisma.warehouse.delete({
-            where: { id },
+            where: {
+                id,
+                userId: session.userId as string,
+            },
         })
         revalidatePath('/dashboard/warehouses')
         return { success: true }
@@ -114,8 +142,17 @@ const locationSchema = z.object({
     parentId: z.string().optional().nullable(),
 })
 export async function getLocations(warehouseId?: string) {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
     try {
-        const where = warehouseId ? { warehouseId } : {}
+        const where: any = {
+            userId: session.userId as string,
+        }
+        if (warehouseId) {
+            where.warehouseId = warehouseId
+        }
+
         const locations = await prisma.location.findMany({
             where,
             include: {
@@ -134,6 +171,9 @@ export async function getLocations(warehouseId?: string) {
 }
 
 export async function createLocation(data: z.infer<typeof locationSchema>) {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
     // Sanitize inputs
     if (data.parentId === 'none' || data.parentId === '') data.parentId = null;
     if (data.warehouseId === 'none' || data.warehouseId === '') data.warehouseId = null;
@@ -145,7 +185,10 @@ export async function createLocation(data: z.infer<typeof locationSchema>) {
 
     try {
         await prisma.location.create({
-            data: validated.data,
+            data: {
+                ...validated.data,
+                userId: session.userId as string,
+            },
         })
         revalidatePath('/dashboard/inventory/locations')
         revalidatePath('/dashboard/warehouses')
@@ -162,6 +205,9 @@ export async function createLocation(data: z.infer<typeof locationSchema>) {
 }
 
 export async function updateLocation(id: string, data: z.infer<typeof locationSchema>) {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
     // Sanitize inputs
     if (data.parentId === 'none' || data.parentId === '') data.parentId = null;
     if (data.warehouseId === 'none' || data.warehouseId === '') data.warehouseId = null;
@@ -173,7 +219,10 @@ export async function updateLocation(id: string, data: z.infer<typeof locationSc
 
     try {
         await prisma.location.update({
-            where: { id },
+            where: {
+                id,
+                userId: session.userId as string,
+            },
             data: validated.data,
         })
         revalidatePath('/dashboard/inventory/locations')
@@ -190,9 +239,15 @@ export async function updateLocation(id: string, data: z.infer<typeof locationSc
 }
 
 export async function deleteLocation(id: string) {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
     try {
         const location = await prisma.location.findUnique({
-            where: { id },
+            where: {
+                id,
+                userId: session.userId as string,
+            },
             include: { warehouse: true },
         })
 
@@ -206,7 +261,10 @@ export async function deleteLocation(id: string) {
         }
 
         await prisma.location.delete({
-            where: { id },
+            where: {
+                id,
+                userId: session.userId as string,
+            },
         })
         revalidatePath('/dashboard/inventory/locations')
         revalidatePath('/dashboard/warehouses')

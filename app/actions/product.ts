@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { Prisma } from '@prisma/client'
+import { getSession } from '@/lib/session'
 
 // --- Products ---
 
@@ -21,8 +22,14 @@ const productSchema = z.object({
 })
 
 export async function getProducts() {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
     try {
         const products = await prisma.product.findMany({
+            where: {
+                userId: session.userId as string,
+            },
             include: {
                 category: true,
                 stockLevels: {
@@ -49,6 +56,9 @@ export async function getProducts() {
 }
 
 export async function createProduct(data: z.infer<typeof productSchema>) {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
     if (data.categoryId === 'none' || data.categoryId === '') data.categoryId = null;
 
     const validated = productSchema.safeParse(data)
@@ -58,7 +68,10 @@ export async function createProduct(data: z.infer<typeof productSchema>) {
 
     try {
         await prisma.product.create({
-            data: validated.data,
+            data: {
+                ...validated.data,
+                userId: session.userId as string,
+            },
         })
         revalidatePath('/dashboard/inventory')
         return { success: true }
@@ -74,6 +87,9 @@ export async function createProduct(data: z.infer<typeof productSchema>) {
 }
 
 export async function updateProduct(id: string, data: z.infer<typeof productSchema>) {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
     if (data.categoryId === 'none' || data.categoryId === '') data.categoryId = null;
 
     const validated = productSchema.safeParse(data)
@@ -83,7 +99,10 @@ export async function updateProduct(id: string, data: z.infer<typeof productSche
 
     try {
         await prisma.product.update({
-            where: { id },
+            where: {
+                id,
+                userId: session.userId as string,
+            },
             data: validated.data,
         })
         revalidatePath('/dashboard/inventory')
@@ -100,9 +119,15 @@ export async function updateProduct(id: string, data: z.infer<typeof productSche
 }
 
 export async function deleteProduct(id: string) {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
     try {
         await prisma.product.delete({
-            where: { id },
+            where: {
+                id,
+                userId: session.userId as string,
+            },
         })
         revalidatePath('/dashboard/inventory')
         return { success: true }
