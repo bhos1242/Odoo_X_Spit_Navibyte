@@ -29,9 +29,18 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
 const signUpSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
+  name: z
+    .string()
+    .min(6, "Login ID must be at least 6 characters")
+    .max(12, "Login ID must not exceed 12 characters")
+    .regex(/^[a-zA-Z0-9_]+$/, "Login ID can only contain letters, numbers, and underscores"),
   email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[!@#$%^&*(),.?":{}|<>]/, "Password must contain at least one special character"),
   role: z.enum(["MANAGER", "STAFF", "STOCK_MASTER"]).optional(),
 });
 
@@ -113,18 +122,21 @@ export function SignUpForm() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-semibold">Full Name</FormLabel>
+                  <FormLabel className="text-sm font-semibold">Login ID</FormLabel>
                   <FormControl>
                     <div className="relative group">
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                       <Input
-                        placeholder="John Doe"
+                        placeholder="username123"
                         className="pl-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
                         {...field}
                       />
                     </div>
                   </FormControl>
                   <FormMessage />
+                  <p className="text-xs text-muted-foreground mt-1.5">
+                    6-12 characters, letters, numbers, and underscores only
+                  </p>
                 </FormItem>
               )}
             />
@@ -170,7 +182,7 @@ export function SignUpForm() {
                   </FormControl>
                   <FormMessage />
                   <p className="text-xs text-muted-foreground mt-1.5">
-                    Must be at least 6 characters long
+                    Minimum 8 characters with uppercase, lowercase, and special character
                   </p>
                 </FormItem>
               )}
