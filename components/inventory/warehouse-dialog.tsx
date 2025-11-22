@@ -48,9 +48,13 @@ interface WarehouseDialogProps {
   } | null;
 }
 
-export function WarehouseDialog({ open: controlledOpen, onOpenChange: controlledOnOpenChange, warehouseToEdit }: WarehouseDialogProps = {}) {
+export function WarehouseDialog({
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+  warehouseToEdit,
+}: WarehouseDialogProps = {}) {
   const [internalOpen, setInternalOpen] = useState(false);
-  
+
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setOpen = controlledOnOpenChange || setInternalOpen;
 
@@ -88,7 +92,9 @@ export function WarehouseDialog({ open: controlledOpen, onOpenChange: controlled
     }
 
     if (result.success) {
-      toast.success(warehouseToEdit ? "Warehouse updated" : "Warehouse created");
+      toast.success(
+        warehouseToEdit ? "Warehouse updated" : "Warehouse created"
+      );
       setOpen(false);
       form.reset();
     } else {
@@ -108,9 +114,13 @@ export function WarehouseDialog({ open: controlledOpen, onOpenChange: controlled
       )}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{warehouseToEdit ? "Edit Warehouse" : "Add Warehouse"}</DialogTitle>
+          <DialogTitle>
+            {warehouseToEdit ? "Edit Warehouse" : "Add Warehouse"}
+          </DialogTitle>
           <DialogDescription>
-            {warehouseToEdit ? "Update warehouse details." : "Create a new warehouse to manage stock locations."}
+            {warehouseToEdit
+              ? "Update warehouse details."
+              : "Create a new warehouse to manage stock locations."}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>

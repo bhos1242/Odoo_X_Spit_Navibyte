@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import {
   createLocation,
+  updateLocation,
   getWarehouses,
   getLocations,
 } from "@/app/actions/warehouse";
@@ -57,10 +58,26 @@ const locationSchema = z.object({
   parentId: z.string().optional(),
 });
 
-export function LocationDialog() {
-  const [open, setOpen] = useState(false);
+interface LocationDialogProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  locationToEdit?: {
+    id: string;
+    name: string;
+    shortCode: string;
+    type: string;
+    warehouseId?: string | null;
+    parentId?: string | null;
+  } | null;
+}
+
+export function LocationDialog({ open: controlledOpen, onOpenChange: controlledOnOpenChange, locationToEdit }: LocationDialogProps = {}) {
+  const [internalOpen, setInternalOpen] = useState(false);
   const [warehouses, setWarehouses] = useState<any[]>([]);
   const [locations, setLocations] = useState<any[]>([]);
+
+  const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = controlledOnOpenChange || setInternalOpen;
 
   const form = useForm<z.infer<typeof locationSchema>>({
     resolver: zodResolver(locationSchema),
@@ -72,7 +89,7 @@ export function LocationDialog() {
   });
 
   useEffect(() => {
-    if (open) {
+    if (isOpen) {
       getWarehouses().then((res) => {
         if (res.success) setWarehouses(res.data || []);
       });
@@ -80,33 +97,61 @@ export function LocationDialog() {
         if (res.success) setLocations(res.data || []);
       });
     }
-  }, [open]);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (locationToEdit) {
+      form.reset({
+        name: locationToEdit.name,
+        shortCode: locationToEdit.shortCode,
+        type: locationToEdit.type as any,
+        warehouseId: locationToEdit.warehouseId || "none",
+        parentId: locationToEdit.parentId || "none",
+      });
+    } else {
+      form.reset({
+        name: "",
+        shortCode: "",
+        type: "INTERNAL",
+        warehouseId: "none",
+        parentId: "none",
+      });
+    }
+  }, [locationToEdit, form, isOpen]);
 
   async function onSubmit(values: z.infer<typeof locationSchema>) {
-    const result = await createLocation(values);
+    let result;
+    if (locationToEdit) {
+      result = await updateLocation(locationToEdit.id, values);
+    } else {
+      result = await createLocation(values);
+    }
+
     if (result.success) {
       setOpen(false);
       form.reset();
-      toast.success("Location created successfully");
+      toast.success(locationToEdit ? "Location updated" : "Location created");
     } else {
-      toast.error("Failed to create location");
+      toast.error(locationToEdit ? "Failed to update location" : "Failed to create location");
       console.error(result.error);
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Location
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={setOpen}>
+      {controlledOpen === undefined && (
+        <DialogTrigger asChild>
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Location
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create Location</DialogTitle>
+          <DialogTitle>{locationToEdit ? "Edit Location" : "Create Location"}</DialogTitle>
           <DialogDescription>
-            Add a new location to your inventory.
+            {locationToEdit ? "Update location details." : "Add a new location to your inventory."}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
