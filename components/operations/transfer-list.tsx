@@ -32,10 +32,10 @@ interface Transfer {
   reference: string;
   type: string;
   status: string;
-  contact?: { name: string };
-  sourceLocation?: { name: string };
-  destinationLocation?: { name: string };
-  scheduledDate?: string;
+  contact?: { name: string } | null;
+  sourceLocation?: { name: string } | null;
+  destinationLocation?: { name: string } | null;
+  scheduledDate?: Date | string | null;
   stockMoves: any[];
 }
 
