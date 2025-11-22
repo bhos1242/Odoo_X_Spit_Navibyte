@@ -102,9 +102,9 @@ export async function signIn(prevState: any, formData: FormData) {
     try {
         // Check if identifier is an email or Login ID
         const isEmail = identifier.includes('@')
-        
+
         const user = await prisma.user.findFirst({
-            where: isEmail 
+            where: isEmail
                 ? { email: identifier }
                 : { name: identifier }
         })
