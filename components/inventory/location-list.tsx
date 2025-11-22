@@ -116,11 +116,13 @@ export function LocationList({ locations }: LocationListProps) {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setEditingLocation(location)}>
+                        <DropdownMenuItem
+                          onClick={() => setEditingLocation(location)}
+                        >
                           <Pencil className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           className="text-red-600"
                           onClick={() => setDeletingId(location.id)}
                         >
@@ -137,23 +139,30 @@ export function LocationList({ locations }: LocationListProps) {
         </Table>
       </div>
 
-      <LocationDialog 
-        open={!!editingLocation} 
+      <LocationDialog
+        open={!!editingLocation}
         onOpenChange={(open) => !open && setEditingLocation(null)}
         locationToEdit={editingLocation}
       />
 
-      <AlertDialog open={!!deletingId} onOpenChange={(open) => !open && setDeletingId(null)}>
+      <AlertDialog
+        open={!!deletingId}
+        onOpenChange={(open) => !open && setDeletingId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the location.
+              This action cannot be undone. This will permanently delete the
+              location.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

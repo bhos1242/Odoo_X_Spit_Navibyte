@@ -71,7 +71,11 @@ interface LocationDialogProps {
   } | null;
 }
 
-export function LocationDialog({ open: controlledOpen, onOpenChange: controlledOnOpenChange, locationToEdit }: LocationDialogProps = {}) {
+export function LocationDialog({
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+  locationToEdit,
+}: LocationDialogProps = {}) {
   const [internalOpen, setInternalOpen] = useState(false);
   const [warehouses, setWarehouses] = useState<any[]>([]);
   const [locations, setLocations] = useState<any[]>([]);
@@ -132,7 +136,11 @@ export function LocationDialog({ open: controlledOpen, onOpenChange: controlledO
       form.reset();
       toast.success(locationToEdit ? "Location updated" : "Location created");
     } else {
-      toast.error(locationToEdit ? "Failed to update location" : "Failed to create location");
+      toast.error(
+        locationToEdit
+          ? "Failed to update location"
+          : "Failed to create location"
+      );
       console.error(result.error);
     }
   }
@@ -149,9 +157,13 @@ export function LocationDialog({ open: controlledOpen, onOpenChange: controlledO
       )}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{locationToEdit ? "Edit Location" : "Create Location"}</DialogTitle>
+          <DialogTitle>
+            {locationToEdit ? "Edit Location" : "Create Location"}
+          </DialogTitle>
           <DialogDescription>
-            {locationToEdit ? "Update location details." : "Add a new location to your inventory."}
+            {locationToEdit
+              ? "Update location details."
+              : "Add a new location to your inventory."}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
