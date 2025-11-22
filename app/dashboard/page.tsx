@@ -3,7 +3,9 @@ import { OperationCard } from "@/components/dashboard/operation-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
-import { AlertTriangle, DollarSign, Package } from "lucide-react";
+import { AlertTriangle, DollarSign, Package, Plus, Truck } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default async function DashboardPage() {
   const { data: stats } = await getDashboardStats();
@@ -19,6 +21,18 @@ export default async function DashboardPage() {
           title="Dashboard"
           description="Overview of your inventory operations"
         />
+        <div className="flex items-center gap-2">
+          <Link href="/dashboard/operations/receipts">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" /> Add Stock
+            </Button>
+          </Link>
+          <Link href="/dashboard/operations/deliveries">
+            <Button variant="secondary">
+              <Truck className="mr-2 h-4 w-4" /> Deliver Stock
+            </Button>
+          </Link>
+        </div>
       </div>
       <Separator />
 
