@@ -23,9 +23,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { createWarehouse } from "@/app/actions/warehouse";
-import { toast } from "react-hot-toast";
-import { Plus } from "lucide-react";
+import { updateWarehouse, createWarehouse } from "@/app/actions/warehouse";
+import { toast } from "sonner";
+import { Plus, Pencil } from "lucide-react";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -36,8 +37,23 @@ const formSchema = z.object({
   address: z.string().optional(),
 });
 
-export function WarehouseDialog() {
-  const [open, setOpen] = useState(false);
+interface WarehouseDialogProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  warehouseToEdit?: {
+    id: string;
+    name: string;
+    shortCode: string;
+    address: string | null;
+  } | null;
+}
+
+export function WarehouseDialog({ open: controlledOpen, onOpenChange: controlledOnOpenChange, warehouseToEdit }: WarehouseDialogProps = {}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  
+  const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = controlledOnOpenChange || setInternalOpen;
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -47,30 +63,54 @@ export function WarehouseDialog() {
     },
   });
 
+  useEffect(() => {
+    if (warehouseToEdit) {
+      form.reset({
+        name: warehouseToEdit.name,
+        shortCode: warehouseToEdit.shortCode,
+        address: warehouseToEdit.address || "",
+      });
+    } else {
+      form.reset({
+        name: "",
+        shortCode: "",
+        address: "",
+      });
+    }
+  }, [warehouseToEdit, form, isOpen]);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const result = await createWarehouse(values);
+    let result;
+    if (warehouseToEdit) {
+      result = await updateWarehouse(warehouseToEdit.id, values);
+    } else {
+      result = await createWarehouse(values);
+    }
+
     if (result.success) {
-      toast.success("Warehouse created successfully");
+      toast.success(warehouseToEdit ? "Warehouse updated" : "Warehouse created");
       setOpen(false);
       form.reset();
     } else {
-      toast.error("Failed to create warehouse");
+      toast.error(result.error as string);
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Warehouse
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={setOpen}>
+      {controlledOpen === undefined && (
+        <DialogTrigger asChild>
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Warehouse
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add Warehouse</DialogTitle>
+          <DialogTitle>{warehouseToEdit ? "Edit Warehouse" : "Add Warehouse"}</DialogTitle>
           <DialogDescription>
-            Create a new warehouse to manage stock locations.
+            {warehouseToEdit ? "Update warehouse details." : "Create a new warehouse to manage stock locations."}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
