@@ -49,10 +49,10 @@ export async function createWarehouse(data: z.infer<typeof warehouseSchema>) {
 
 const locationSchema = z.object({
     name: z.string().min(2, "Name is required"),
-    shortCode: z.string().min(2, "Short code is required"),
+    shortCode: z.string().min(2, "Short code is required").max(20, "Short code too long"),
     type: z.enum(['VIEW', 'INTERNAL', 'CUSTOMER', 'VENDOR', 'INVENTORY_LOSS', 'PRODUCTION', 'TRANSIT']),
-    warehouseId: z.string().optional(),
-    parentId: z.string().optional(),
+    warehouseId: z.string().optional().nullable(),
+    parentId: z.string().optional().nullable(),
 })
 export async function getLocations(warehouseId?: string) {
     try {
@@ -75,6 +75,10 @@ export async function getLocations(warehouseId?: string) {
 }
 
 export async function createLocation(data: z.infer<typeof locationSchema>) {
+    // Sanitize inputs
+    if (data.parentId === 'none' || data.parentId === '') data.parentId = null;
+    if (data.warehouseId === 'none' || data.warehouseId === '') data.warehouseId = null;
+
     const validated = locationSchema.safeParse(data)
     if (!validated.success) {
         return { success: false, error: validated.error.flatten().fieldErrors }
@@ -84,9 +88,11 @@ export async function createLocation(data: z.infer<typeof locationSchema>) {
         await prisma.location.create({
             data: validated.data,
         })
+        revalidatePath('/dashboard/inventory/locations')
         revalidatePath('/dashboard/warehouses')
         return { success: true }
     } catch (error) {
+        console.error(error)
         return { success: false, error: 'Failed to create location' }
     }
 }

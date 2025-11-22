@@ -15,6 +15,7 @@ import {
   ClipboardList,
   Truck,
   Container,
+  MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -61,6 +62,11 @@ const sidebarGroups = [
         title: "Warehouses",
         href: "/dashboard/warehouses",
         icon: Warehouse,
+      },
+      {
+        title: "Locations",
+        href: "/dashboard/inventory/locations",
+        icon: MapPin,
       },
     ],
   },

@@ -184,6 +184,7 @@ export function LocationDialog() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
                       {warehouses.map((wh) => (
                         <SelectItem key={wh.id} value={wh.id}>
                           {wh.name}
