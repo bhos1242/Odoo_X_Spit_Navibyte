@@ -24,9 +24,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { updateWarehouse, createWarehouse } from "@/app/actions/warehouse";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { Plus, Pencil } from "lucide-react";
 import { useEffect } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -54,9 +55,49 @@ export function WarehouseDialog({
   warehouseToEdit,
 }: WarehouseDialogProps = {}) {
   const [internalOpen, setInternalOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setOpen = controlledOnOpenChange || setInternalOpen;
+
+  const createMutation = useMutation({
+    mutationFn: createWarehouse,
+    onSuccess: (result) => {
+      if (result.success) {
+        setOpen(false);
+        form.reset();
+        toast.success("Warehouse created");
+        queryClient.invalidateQueries({ queryKey: ["warehouses"] });
+      } else {
+        toast.error("Failed to create warehouse");
+        console.error(result.error);
+      }
+    },
+    onError: (error) => {
+      toast.error("Failed to create warehouse");
+      console.error(error);
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      updateWarehouse(id, data),
+    onSuccess: (result) => {
+      if (result.success) {
+        setOpen(false);
+        form.reset();
+        toast.success("Warehouse updated");
+        queryClient.invalidateQueries({ queryKey: ["warehouses"] });
+      } else {
+        toast.error("Failed to update warehouse");
+        console.error(result.error);
+      }
+    },
+    onError: (error) => {
+      toast.error("Failed to update warehouse");
+      console.error(error);
+    },
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -84,21 +125,10 @@ export function WarehouseDialog({
   }, [warehouseToEdit, form, isOpen]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    let result;
     if (warehouseToEdit) {
-      result = await updateWarehouse(warehouseToEdit.id, values);
+      updateMutation.mutate({ id: warehouseToEdit.id, data: values });
     } else {
-      result = await createWarehouse(values);
-    }
-
-    if (result.success) {
-      toast.success(
-        warehouseToEdit ? "Warehouse updated" : "Warehouse created"
-      );
-      setOpen(false);
-      form.reset();
-    } else {
-      toast.error(result.error as string);
+      createMutation.mutate(values);
     }
   }
 
