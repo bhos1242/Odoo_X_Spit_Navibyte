@@ -12,16 +12,8 @@ const signUpSchema = z.object({
     role: z.enum(['MANAGER', 'STAFF', 'STOCK_MASTER']).optional(),
 })
 
-export async function signUp(prevState: any, formData: FormData) {
-    const validatedFields = signUpSchema.safeParse({
-        name: formData.get('name'),
-        email: formData.get('email'),
-        password: formData.get('password'),
-        role: formData.get('role'),
-    })
-
-    console.log(`🚀 ~ auth.ts:23 ~ validatedFields:`, validatedFields)
-
+export async function signUp(data: z.infer<typeof signUpSchema>) {
+    const validatedFields = signUpSchema.safeParse(data)
 
     if (!validatedFields.success) {
         return {
@@ -53,13 +45,13 @@ export async function signUp(prevState: any, formData: FormData) {
             },
         })
 
+        return { success: true }
+
     } catch (error) {
         return {
             message: 'Database Error: Failed to create user.',
         }
     }
-
-    redirect('/sign-in')
 }
 
 const signInSchema = z.object({

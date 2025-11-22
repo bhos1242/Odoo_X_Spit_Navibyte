@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -24,8 +23,9 @@ import {
 } from "@/components/ui/form";
 import { toast } from "sonner";
 import { signUp } from "@/app/actions/auth";
-import { useTransition } from "react";
 import Link from "next/link";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 const signUpSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -37,8 +37,7 @@ const signUpSchema = z.object({
 type SignUpValues = z.infer<typeof signUpSchema>;
 
 export function SignUpForm() {
-  const [isPending, startTransition] = useTransition();
-
+  const router = useRouter();
   const form = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -49,27 +48,30 @@ export function SignUpForm() {
     },
   });
 
-  function onSubmit(values: SignUpValues) {
-    startTransition(async () => {
-      const formData = new FormData();
-      formData.append("name", values.name);
-      formData.append("email", values.email);
-      formData.append("password", values.password);
-      if (values.role) formData.append("role", values.role);
-
-      const result = await signUp(null, formData);
-
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (values: SignUpValues) => {
+      const result = await signUp(values);
+      return result;
+    },
+    onSuccess: (result) => {
       if (result?.errors) {
-        // Handle field errors
         Object.entries(result.errors).forEach(([key, errors]) => {
           form.setError(key as any, { message: errors[0] });
         });
       } else if (result?.message) {
         toast.error(result.message);
-      } else {
+      } else if (result?.success) {
         toast.success("Account created successfully! Please sign in.");
+        router.push("/sign-in");
       }
-    });
+    },
+    onError: () => {
+      toast.error("Something went wrong. Please try again.");
+    },
+  });
+
+  function onSubmit(values: SignUpValues) {
+    mutate(values);
   }
 
   return (
