@@ -32,7 +32,7 @@ import { forgotPassword, resetPassword } from "@/app/actions/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Mail, Lock, KeyRound, ArrowRight, Shield, ArrowLeft } from "lucide-react";
+import { Mail, Lock, KeyRound, ArrowRight, Shield, ArrowLeft, Eye, EyeOff } from "lucide-react";
 
 const emailSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -214,6 +214,8 @@ function EmailForm({ onSuccess }: { onSuccess: (email: string) => void }) {
 
 function ResetForm({ email, onBack }: { email: string; onBack: () => void }) {
   const [isPending, startTransition] = useTransition();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
   const resetForm = useForm<ResetValues>({
     resolver: zodResolver(resetSchema),
@@ -294,10 +296,21 @@ function ResetForm({ email, onBack }: { email: string; onBack: () => void }) {
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                   <Input
                     placeholder="••••••••"
-                    type="password"
-                    className="pl-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
+                    type={showPassword ? "text" : "password"}
+                    className="pl-10 pr-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
                     {...field}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
                 </div>
               </FormControl>
               <FormMessage />
@@ -315,10 +328,21 @@ function ResetForm({ email, onBack }: { email: string; onBack: () => void }) {
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                   <Input
                     placeholder="••••••••"
-                    type="password"
-                    className="pl-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
+                    type={showConfirmPassword ? "text" : "password"}
+                    className="pl-10 pr-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
                     {...field}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
                 </div>
               </FormControl>
               <FormMessage />

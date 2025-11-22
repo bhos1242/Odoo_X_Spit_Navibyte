@@ -23,10 +23,10 @@ import {
 } from "@/components/ui/form";
 import toast from "react-hot-toast";
 import { signIn } from "@/app/actions/auth";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, Lock, ArrowRight, Sparkles } from "lucide-react";
+import { Mail, Lock, ArrowRight, Sparkles, Eye, EyeOff } from "lucide-react";
 
 const signInSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -37,6 +37,7 @@ type SignInValues = z.infer<typeof signInSchema>;
 
 export function SignInForm() {
   const [isPending, startTransition] = useTransition();
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<SignInValues>({
     resolver: zodResolver(signInSchema),
@@ -129,10 +130,21 @@ export function SignInForm() {
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                       <Input
                         placeholder="••••••••"
-                        type="password"
-                        className="pl-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
+                        type={showPassword ? "text" : "password"}
+                        className="pl-10 pr-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
                         {...field}
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
                     </div>
                   </FormControl>
                   <FormMessage />
