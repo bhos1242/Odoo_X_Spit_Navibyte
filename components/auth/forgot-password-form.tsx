@@ -185,6 +185,12 @@ export function ForgotPasswordForm() {
                         pattern={REGEXP_ONLY_DIGITS}
                         autoFocus
                         {...field}
+                        onChange={(value) => {
+                          console.log("DEBUG: OTP onChange", value);
+                          field.onChange(value);
+                        }}
+                        onFocus={() => console.log("DEBUG: OTP onFocus")}
+                        onClick={() => console.log("DEBUG: OTP onClick")}
                       >
                         <InputOTPGroup>
                           <InputOTPSlot index={0} />
