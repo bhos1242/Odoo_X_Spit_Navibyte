@@ -25,7 +25,7 @@ import toast from "react-hot-toast";
 import { signIn } from "@/app/actions/auth";
 import { useTransition } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { Box, Mail, Lock, ArrowRight, Sparkles } from "lucide-react";
 
 const signInSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -64,74 +64,120 @@ export function SignInForm() {
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader className="space-y-1 flex flex-col items-center">
-        <div className="w-12 h-12 relative mb-2">
-          <Image
-            src="/logo.png"
-            alt="Logo"
-            fill
-            className="object-contain"
-            priority
-          />
+    <Card className="w-full max-w-md mx-auto relative overflow-hidden border border-border/50 bg-background/80 backdrop-blur-xl shadow-2xl">
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-purple-500/5 pointer-events-none"></div>
+      
+      {/* Shine Effect */}
+      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-linear-to-r from-transparent via-white/5 to-transparent pointer-events-none"></div>
+
+      <CardHeader className="space-y-3 flex flex-col items-center text-center relative z-10 pb-8">
+        {/* Logo */}
+        <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-primary to-purple-600 text-white shadow-xl shadow-primary/25 mb-2 group hover:scale-110 transition-transform duration-300">
+          <Box className="h-8 w-8 transition-transform duration-300 group-hover:rotate-12" />
+          <div className="absolute inset-0 rounded-2xl bg-linear-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
         </div>
-        <CardTitle>Sign In</CardTitle>
-        <CardDescription>
-          Welcome back! Please sign in to continue.
-        </CardDescription>
+
+        {/* Title with Badge */}
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-2">
+            <Sparkles className="h-3 w-3 text-primary animate-pulse" />
+            <span className="text-xs font-semibold text-primary">Secure Login</span>
+          </div>
+          <CardTitle className="text-2xl md:text-3xl font-extrabold bg-linear-to-r from-foreground to-foreground/70 bg-clip-text">
+            Welcome Back
+          </CardTitle>
+          <CardDescription className="text-base">
+            Sign in to access your inventory dashboard
+          </CardDescription>
+        </div>
       </CardHeader>
-      <CardContent>
+
+      <CardContent className="relative z-10">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="text-sm font-semibold">Email Address</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="john@example.com"
-                      type="email"
-                      {...field}
-                    />
+                    <div className="relative group">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <Input
+                        placeholder="john@example.com"
+                        type="email"
+                        className="pl-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
+                        {...field}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel className="text-sm font-semibold">Password</FormLabel>
                   <FormControl>
-                    <Input placeholder="******" type="password" {...field} />
+                    <div className="relative group">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <Input
+                        placeholder="••••••••"
+                        type="password"
+                        className="pl-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
+                        {...field}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? "Signing in..." : "Sign In"}
-            </Button>
-            <div className="text-center">
+
+            <div className="flex items-center justify-end">
               <Link
                 href={"/forgot-password" as any}
-                className="text-sm text-muted-foreground hover:text-primary hover:underline"
+                className="text-sm font-medium text-primary hover:underline transition-colors"
               >
-                Forgot your password?
+                Forgot password?
               </Link>
             </div>
+
+            <Button
+              type="submit"
+              className="w-full h-11 bg-linear-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover:scale-[1.02] font-semibold group"
+              disabled={isPending}
+            >
+              {isPending ? (
+                <>
+                  <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  Sign In
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </>
+              )}
+            </Button>
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="flex justify-center">
+
+      <CardFooter className="flex justify-center relative z-10 pt-6 border-t border-border/50">
         <p className="text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link href="/sign-up" className="text-primary hover:underline">
-            Sign up
+          <Link
+            href="/sign-up"
+            className="font-semibold text-primary hover:underline transition-colors"
+          >
+            Sign up for free
           </Link>
         </p>
       </CardFooter>
