@@ -58,11 +58,41 @@ export function ReceiptView({ transfer }: ReceiptViewProps) {
     }
   };
 
+  const getTitle = (type: string) => {
+    switch (type) {
+      case "INCOMING":
+        return "Receipt";
+      case "OUTGOING":
+        return "Delivery Order";
+      case "INTERNAL":
+        return "Internal Transfer";
+      case "ADJUSTMENT":
+        return "Inventory Adjustment";
+      default:
+        return "Transfer";
+    }
+  };
+
+  const getBackLink = (type: string) => {
+    switch (type) {
+      case "INCOMING":
+        return "/dashboard/operations/receipts" as const;
+      case "OUTGOING":
+        return "/dashboard/operations/deliveries" as const;
+      case "INTERNAL":
+        return "/dashboard/operations/internal" as const;
+      case "ADJUSTMENT":
+        return "/dashboard/operations/adjustments" as const;
+      default:
+        return "/dashboard/operations/receipts" as const;
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/dashboard/operations/receipts">
+          <Link href={getBackLink(transfer.type) as any}>
             <Button variant="outline" size="icon">
               <ArrowLeft className="h-4 w-4" />
             </Button>
@@ -159,7 +189,7 @@ export function ReceiptView({ transfer }: ReceiptViewProps) {
         <div className="space-y-6">
           <div className="flex justify-between items-start border-b pb-6">
             <div>
-              <h2 className="text-2xl font-bold">Receipt</h2>
+              <h2 className="text-2xl font-bold">{getTitle(transfer.type)}</h2>
               <p className="text-sm text-gray-500">{transfer.reference}</p>
             </div>
             <div className="text-right">
