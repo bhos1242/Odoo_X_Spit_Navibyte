@@ -1,7 +1,20 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowRight, Box, LayoutDashboard, ShieldCheck, Truck, Warehouse } from "lucide-react"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ArrowRight,
+  Box,
+  LayoutDashboard,
+  ShieldCheck,
+  Truck,
+  Warehouse,
+} from "lucide-react";
 
 export default function Home() {
   return (
@@ -25,13 +38,14 @@ export default function Home() {
 
       <main className="flex-1">
         <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32">
-          <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center">
+          <div className="container flex max-w-5xl flex-col items-center gap-4 text-center">
             <h1 className="font-heading text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">
               Modern Inventory Management for Growing Businesses
             </h1>
-            <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8">
-              Streamline your operations with our comprehensive inventory solution. 
-              Manage products, warehouses, and stock moves with ease and precision.
+            <p className="max-w-2xl leading-normal text-muted-foreground sm:text-xl sm:leading-8">
+              Streamline your operations with our comprehensive inventory
+              solution. Manage products, warehouses, and stock moves with ease
+              and precision.
             </p>
             <div className="space-x-4">
               <Link href="/dashboard">
@@ -58,7 +72,8 @@ export default function Home() {
                 <Warehouse className="h-10 w-10 mb-2 text-primary" />
                 <CardTitle>Multi-Warehouse</CardTitle>
                 <CardDescription>
-                  Manage multiple warehouses and locations with hierarchical structures.
+                  Manage multiple warehouses and locations with hierarchical
+                  structures.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -67,7 +82,8 @@ export default function Home() {
                 <Box className="h-10 w-10 mb-2 text-primary" />
                 <CardTitle>Product Management</CardTitle>
                 <CardDescription>
-                  Track storable, consumable, and service products with detailed attributes.
+                  Track storable, consumable, and service products with detailed
+                  attributes.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -76,7 +92,8 @@ export default function Home() {
                 <Truck className="h-10 w-10 mb-2 text-primary" />
                 <CardTitle>Stock Operations</CardTitle>
                 <CardDescription>
-                  Handle receipts, deliveries, and internal transfers seamlessly.
+                  Handle receipts, deliveries, and internal transfers
+                  seamlessly.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -85,7 +102,8 @@ export default function Home() {
                 <LayoutDashboard className="h-10 w-10 mb-2 text-primary" />
                 <CardTitle>Real-time Dashboard</CardTitle>
                 <CardDescription>
-                  Get instant insights into your stock levels and recent movements.
+                  Get instant insights into your stock levels and recent
+                  movements.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -94,7 +112,8 @@ export default function Home() {
                 <ShieldCheck className="h-10 w-10 mb-2 text-primary" />
                 <CardTitle>Secure Access</CardTitle>
                 <CardDescription>
-                  Role-based access control to ensure data security and integrity.
+                  Role-based access control to ensure data security and
+                  integrity.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -103,7 +122,8 @@ export default function Home() {
                 <ArrowRight className="h-10 w-10 mb-2 text-primary" />
                 <CardTitle>Scalable</CardTitle>
                 <CardDescription>
-                  Built on modern tech stack (Next.js 16, Prisma) to grow with you.
+                  Built on modern tech stack (Next.js 16, Prisma) to grow with
+                  you.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -114,10 +134,14 @@ export default function Home() {
       <footer className="py-6 md:px-8 md:py-0">
         <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
           <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
-            Built by <span className="font-medium underline underline-offset-4">Odoo Spit Team</span>.
+            Built by{" "}
+            <span className="font-medium underline underline-offset-4">
+              Odoo Spit Team
+            </span>
+            .
           </p>
         </div>
       </footer>
     </div>
-  )
+  );
 }
