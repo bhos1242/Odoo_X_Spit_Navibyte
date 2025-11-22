@@ -1,5 +1,8 @@
 "use client";
 
+import { deleteContact, getContacts } from "@/app/actions/contact";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -8,11 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getContacts, deleteContact } from "@/app/actions/contact";
 import { toast } from "sonner";
 
 interface Contact {

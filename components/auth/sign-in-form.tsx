@@ -108,7 +108,7 @@ export function SignInForm() {
             </Button>
             <div className="text-center">
               <Link
-                href="/forgot-password"
+                href={"/forgot-password" as any}
                 className="text-sm text-muted-foreground hover:text-primary hover:underline"
               >
                 Forgot your password?

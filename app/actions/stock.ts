@@ -15,7 +15,17 @@ export async function getStockMoves() {
                 createdAt: 'desc',
             },
         })
-        return { success: true, data: moves }
+
+        const serializedMoves = moves.map(move => ({
+            ...move,
+            product: {
+                ...move.product,
+                costPrice: move.product.costPrice.toNumber(),
+                salesPrice: move.product.salesPrice.toNumber(),
+            }
+        }))
+
+        return { success: true, data: serializedMoves }
     } catch (error) {
         console.error('Failed to fetch stock moves:', error)
         return { success: false, error: 'Failed to fetch stock moves' }
