@@ -68,15 +68,14 @@ export async function signUp(data: z.infer<typeof signUpSchema>) {
     }
 }
 
+import { createSession, deleteSession } from '@/lib/session'
+
 const signInSchema = z.object({
     email: z.string().email('Invalid email address'),
     password: z.string().min(1, 'Password is required'),
 })
 
 export async function signIn(prevState: any, formData: FormData) {
-    // This is a placeholder for actual session management (e.g. NextAuth.js or custom JWT)
-    // For this exercise, we will verify credentials and redirect.
-
     const validatedFields = signInSchema.safeParse({
         email: formData.get('email'),
         password: formData.get('password'),
@@ -109,13 +108,19 @@ export async function signIn(prevState: any, formData: FormData) {
             }
         }
 
-        // TODO: Set session cookie here
+        await createSession(user.id, user.role)
 
     } catch (error) {
+        console.error("Sign in error:", error)
         return {
             message: 'Something went wrong.',
         }
     }
 
     redirect('/dashboard')
+}
+
+export async function signOut() {
+    await deleteSession()
+    redirect('/sign-in')
 }
