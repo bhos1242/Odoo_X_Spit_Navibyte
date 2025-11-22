@@ -54,7 +54,9 @@ interface LocationListProps {
   locations: Location[];
 }
 
-export function LocationList({ locations: initialLocations }: LocationListProps) {
+export function LocationList({
+  locations: initialLocations,
+}: LocationListProps) {
   const [editingLocation, setEditingLocation] = useState<Location | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const queryClient = useQueryClient();
