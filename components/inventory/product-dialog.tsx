@@ -92,7 +92,6 @@ export function ProductDialog({
             ? result.error
             : "Failed to create product"
         );
-        console.error(result.error);
       }
     },
     onError: (error) => {

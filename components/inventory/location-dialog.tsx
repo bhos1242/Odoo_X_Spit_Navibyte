@@ -121,7 +121,11 @@ export function LocationDialog({
         toast.success("Location created");
         queryClient.invalidateQueries({ queryKey: ["locations"] });
       } else {
-        toast.error("Failed to create location");
+        toast.error(
+          typeof result.error === "string"
+            ? result.error
+            : "Failed to create location"
+        );
         console.error(result.error);
       }
     },
@@ -141,7 +145,11 @@ export function LocationDialog({
         toast.success("Location updated");
         queryClient.invalidateQueries({ queryKey: ["locations"] });
       } else {
-        toast.error("Failed to update location");
+        toast.error(
+          typeof result.error === "string"
+            ? result.error
+            : "Failed to update location"
+        );
         console.error(result.error);
       }
     },
