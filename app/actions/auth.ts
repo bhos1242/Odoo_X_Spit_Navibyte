@@ -14,7 +14,7 @@ const signUpSchema = z.object({
 
 export async function signUp(data: z.infer<typeof signUpSchema>) {
     console.log("signUp action called with data:", JSON.stringify(data, null, 2));
-    
+
     const validatedFields = signUpSchema.safeParse(data)
 
     if (!validatedFields.success) {
@@ -32,7 +32,7 @@ export async function signUp(data: z.infer<typeof signUpSchema>) {
             console.error("Prisma instance is undefined!");
             throw new Error("Prisma instance is undefined");
         }
-        
+
         const existingUser = await prisma.user.findUnique({
             where: { email },
         })
@@ -56,7 +56,7 @@ export async function signUp(data: z.infer<typeof signUpSchema>) {
                 role: role as any || 'STAFF',
             },
         })
-        
+
         console.log("User created successfully.");
         return { success: true }
 
