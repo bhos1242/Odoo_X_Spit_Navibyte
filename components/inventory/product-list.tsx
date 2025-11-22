@@ -114,10 +114,12 @@ export function ProductList({ products: initialProducts }: ProductListProps) {
               </TableRow>
             ) : (
               products.map((product) => {
-                const totalStock = product.stockLevels.reduce(
-                  (acc, curr) => acc + curr.quantity,
-                  0
-                );
+                const totalStock = product.stockLevels.reduce((acc, curr) => {
+                  if (curr.location?.type === "INTERNAL") {
+                    return acc + curr.quantity;
+                  }
+                  return acc;
+                }, 0);
                 return (
                   <TableRow key={product.id}>
                     <TableCell className="font-medium">

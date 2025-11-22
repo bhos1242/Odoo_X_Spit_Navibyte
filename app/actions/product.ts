@@ -25,7 +25,11 @@ export async function getProducts() {
         const products = await prisma.product.findMany({
             include: {
                 category: true,
-                stockLevels: true, // To calculate total stock
+                stockLevels: {
+                    include: {
+                        location: true
+                    }
+                },
             },
             orderBy: {
                 createdAt: 'desc',
