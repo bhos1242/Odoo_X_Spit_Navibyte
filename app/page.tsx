@@ -24,7 +24,7 @@ export default function Home() {
     <div className="flex min-h-screen flex-col bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-        <div className="container flex h-16 items-center justify-between px-4 md:px-6">
+        <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Box className="h-5 w-5" />
@@ -68,9 +68,9 @@ export default function Home() {
         {/* Hero Section */}
         <section className="relative overflow-hidden py-20 md:py-32 lg:py-40">
           <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-size-[14px_24px]"></div>
-          <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-primary/20 opacity-20 blur-[100px]"></div>
-
-          <div className="container px-4 md:px-6 flex flex-col items-center text-center gap-8">
+                    <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-primary/20 opacity-20 blur-[100px]"></div>
+          
+          <div className="container mx-auto px-4 md:px-6 flex flex-col items-center text-center gap-8">
             <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
               <span className="flex h-2 w-2 rounded-full bg-primary mr-2"></span>
               v2.0 is now live
@@ -172,7 +172,7 @@ export default function Home() {
 
         {/* CTA Section */}
         <section className="border-t bg-muted/40">
-          <div className="container px-4 md:px-6 py-16 md:py-24 lg:py-32">
+          <div className="container mx-auto px-4 md:px-6 py-16 md:py-24 lg:py-32">
             <div className="flex flex-col items-center text-center gap-6 max-w-2xl mx-auto">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
                 Ready to optimize your inventory?
@@ -193,7 +193,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t bg-background">
-        <div className="container px-4 md:px-6 py-12 md:py-16">
+        <div className="container mx-auto px-4 md:px-6 py-12 md:py-16">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div className="col-span-2 md:col-span-1 space-y-4">
               <div className="flex items-center gap-2 font-bold text-xl">
