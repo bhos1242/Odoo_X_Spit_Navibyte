@@ -3,6 +3,7 @@ import { OperationCard } from "@/components/dashboard/operation-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
+import { Loader } from "@/components/ui/loader";
 import { AlertTriangle, DollarSign, Package, Plus, Truck, TrendingUp, Activity, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -11,14 +12,7 @@ export default async function DashboardPage() {
   const { data: stats } = await getDashboardStats();
 
   if (!stats) {
-    return (
-      <div className="flex-1 flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 rounded-full border-4 border-primary/30 border-t-primary animate-spin"></div>
-          <p className="text-muted-foreground">Loading dashboard...</p>
-        </div>
-      </div>
-    );
+    return <Loader variant="logo" size="lg" text="Loading dashboard..." fullScreen />;
   }
 
   return (
