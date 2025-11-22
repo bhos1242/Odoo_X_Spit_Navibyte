@@ -4,6 +4,7 @@ import { z } from 'zod'
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
+import nodemailer from 'nodemailer'
 
 const signUpSchema = z.object({
     name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -123,4 +124,141 @@ export async function signIn(prevState: any, formData: FormData) {
 export async function signOut() {
     await deleteSession()
     redirect('/sign-in')
+}
+
+const forgotPasswordSchema = z.object({
+    email: z.string().email('Invalid email address'),
+})
+
+export async function forgotPassword(prevState: any, formData: FormData) {
+    const validatedFields = forgotPasswordSchema.safeParse({
+        email: formData.get('email'),
+    })
+
+    if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+        }
+    }
+
+    const { email } = validatedFields.data
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { email },
+        })
+
+        if (!user) {
+            // Don't reveal if user exists
+            return {
+                message: 'If an account exists with this email, you will receive a password reset OTP.',
+                success: true
+            }
+        }
+
+        // Generate 6 digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString()
+        const otpExpiry = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+
+        await prisma.user.update({
+            where: { email },
+            data: {
+                otp,
+                otpExpiry,
+            },
+        })
+
+        // Send email
+        const transporter = nodemailer.createTransport({
+            service: 'gmail', // Or use host/port from env
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        })
+
+        // For development/demo if env vars are missing, log it
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+            console.log(`[DEV MODE] OTP for ${email}: ${otp}`)
+        } else {
+            await transporter.sendMail({
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject: 'Password Reset OTP',
+                text: `Your OTP for password reset is: ${otp}. It expires in 10 minutes.`,
+            })
+        }
+
+        return {
+            success: true,
+            message: 'If an account exists with this email, you will receive a password reset OTP.',
+        }
+
+    } catch (error) {
+        console.error("Forgot password error:", error)
+        return {
+            message: 'Something went wrong.',
+        }
+    }
+}
+
+const resetPasswordSchema = z.object({
+    email: z.string().email(),
+    otp: z.string().length(6, 'OTP must be 6 digits'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+})
+
+export async function resetPassword(prevState: any, formData: FormData) {
+    const validatedFields = resetPasswordSchema.safeParse({
+        email: formData.get('email'),
+        otp: formData.get('otp'),
+        password: formData.get('password'),
+        confirmPassword: formData.get('confirmPassword'),
+    })
+
+    if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+        }
+    }
+
+    const { email, otp, password } = validatedFields.data
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { email },
+        })
+
+        if (!user || user.otp !== otp || !user.otpExpiry || user.otpExpiry < new Date()) {
+            return {
+                message: 'Invalid or expired OTP.',
+            }
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10)
+
+        await prisma.user.update({
+            where: { email },
+            data: {
+                password: hashedPassword,
+                otp: null,
+                otpExpiry: null,
+            },
+        })
+
+        return {
+            success: true,
+            message: 'Password reset successfully. You can now sign in.',
+        }
+
+    } catch (error) {
+        console.error("Reset password error:", error)
+        return {
+            message: 'Something went wrong.',
+        }
+    }
 }
