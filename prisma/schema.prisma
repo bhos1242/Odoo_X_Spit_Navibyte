@@ -15,7 +15,9 @@ datasource db {
 
 // User & Authentication
 enum UserRole {
+  ADMIN
   MANAGER
+  STOCK_MASTER // As per requirements
   STAFF
 }
 
@@ -36,23 +38,43 @@ model Category {
   id          String    @id @default(cuid())
   name        String    @unique
   description String?
+  
+  // Hierarchy: Parent Category
+  parentId    String?
+  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryHierarchy")
+
   products    Product[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+enum ProductType {
+  STORABLE   // Track stock
+  CONSUMABLE // Don't track stock, but allow reception/delivery
+  SERVICE    // No stock, no delivery
 }
 
 model Product {
   id            String   @id @default(cuid())
   name          String
   sku           String   @unique
+  barcode       String?  @unique // Scannable barcode
   description   String?
+  type          ProductType @default(STORABLE)
+  
   unitOfMeasure String   @default("Units") // e.g., kg, pcs, m
   
+  costPrice     Decimal  @default(0.00)
+  salesPrice    Decimal  @default(0.00)
+
   categoryId    String?
   category      Category? @relation(fields: [categoryId], references: [id])
 
   minStock      Int      @default(0) // Reordering rule
   maxStock      Int?     // Reordering rule
+  
+  image         String?  // URL or base64
 
   stockLevels   StockLevel[]
   stockMoves    StockMove[]
@@ -72,11 +94,13 @@ model Warehouse {
 }
 
 enum LocationType {
-  INTERNAL       // Standard stock location
+  VIEW           // Generic parent location (e.g. "Warehouse A")
+  INTERNAL       // Standard stock location (e.g. "Shelf 1")
   CUSTOMER       // Goods sent to customers
   VENDOR         // Goods received from vendors
   INVENTORY_LOSS // For adjustments/scrapping
   PRODUCTION     // Manufacturing location
+  TRANSIT        // Inter-warehouse transit
 }
 
 model Location {
@@ -84,6 +108,11 @@ model Location {
   name        String
   type        LocationType @default(INTERNAL)
   
+  // Hierarchy: Parent Location (e.g., Warehouse -> Zone -> Rack -> Shelf)
+  parentId    String?
+  parent      Location?    @relation("LocationHierarchy", fields: [parentId], references: [id])
+  children    Location[]   @relation("LocationHierarchy")
+
   warehouseId String?
   warehouse   Warehouse?   @relation(fields: [warehouseId], references: [id])
 
@@ -154,6 +183,7 @@ enum ContactType {
 model StockTransfer {
   id                    String         @id @default(cuid())
   reference             String         @unique // e.g., WH/IN/0001
+  origin                String?        // Source document (e.g., PO001, SO002)
   type                  TransferType
   status                TransferStatus @default(DRAFT)
 
@@ -167,6 +197,8 @@ model StockTransfer {
   contact               Contact?       @relation(fields: [contactId], references: [id])
 
   scheduledDate         DateTime?
+  effectiveDate         DateTime?      // When it actually happened
+  
   stockMoves            StockMove[]
 
   createdAt             DateTime       @default(now())
