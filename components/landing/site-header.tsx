@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Box, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
 interface SiteHeaderProps {
@@ -20,10 +21,8 @@ export function SiteHeader({ session }: SiteHeaderProps) {
       <div className="container mx-auto flex h-16 md:h-18 items-center justify-between px-4 md:px-6">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight group">
-          <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-primary to-purple-600 text-white shadow-lg shadow-primary/25 transition-all duration-300 group-hover:shadow-xl group-hover:shadow-primary/40 group-hover:scale-110">
-            <Box className="h-5 w-5 transition-transform duration-300 group-hover:rotate-12" />
-            {/* Shine Effect */}
-            <div className="absolute inset-0 rounded-xl bg-linear-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div className="relative flex h-9 w-9 items-center justify-center transition-all duration-300 group-hover:scale-110">
+            <Image src="/logo.png" alt="IMS Logo" width={36} height={36} className="object-contain transition-transform duration-300 group-hover:rotate-12" />
           </div>
           <span className="bg-linear-to-r from-primary via-purple-600 to-pink-500 bg-clip-text text-transparent font-extrabold transition-all duration-300">
             IMS

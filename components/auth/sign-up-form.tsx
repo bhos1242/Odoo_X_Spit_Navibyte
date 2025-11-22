@@ -24,7 +24,8 @@ import {
 import { toast } from "react-hot-toast";
 import { signUp } from "@/app/actions/auth";
 import Link from "next/link";
-import { Box, Mail, Lock, User, ArrowRight, Sparkles, CheckCircle2 } from "lucide-react";
+import Image from "next/image";
+import { Mail, Lock, User, ArrowRight, Sparkles, CheckCircle2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
@@ -94,9 +95,8 @@ export function SignUpForm() {
 
       <CardHeader className="space-y-3 flex flex-col items-center text-center relative z-10 pb-8">
         {/* Logo */}
-        <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-primary to-purple-600 text-white shadow-xl shadow-primary/25 mb-2 group hover:scale-110 transition-transform duration-300">
-          <Box className="h-8 w-8 transition-transform duration-300 group-hover:rotate-12" />
-          <div className="absolute inset-0 rounded-2xl bg-linear-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        <div className="relative flex h-16 w-16 items-center justify-center mb-2 group hover:scale-110 transition-transform duration-300">
+          <Image src="/logo.png" alt="IMS Logo" width={64} height={64} className="object-contain transition-transform duration-300 group-hover:rotate-12" />
         </div>
 
         {/* Title with Badge */}

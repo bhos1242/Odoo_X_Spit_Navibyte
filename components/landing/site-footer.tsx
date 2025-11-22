@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Box, Github, Twitter, Linkedin, Mail, ArrowRight, Heart } from "lucide-react";
+import Image from "next/image";
+import { Github, Twitter, Linkedin, Mail, ArrowRight, Heart } from "lucide-react";
 
 export function SiteFooter() {
   return (
@@ -21,8 +22,8 @@ export function SiteFooter() {
           {/* Brand Column */}
           <div className="col-span-2 md:col-span-1 space-y-6">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl group">
-              <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-primary to-purple-600 text-white shadow-lg shadow-primary/25 transition-all duration-300 group-hover:shadow-xl group-hover:shadow-primary/40 group-hover:scale-110">
-                <Box className="h-5 w-5 transition-transform duration-300 group-hover:rotate-12" />
+              <div className="relative flex h-10 w-10 items-center justify-center transition-all duration-300 group-hover:scale-110">
+                <Image src="/logo.png" alt="IMS Logo" width={40} height={40} className="object-contain transition-transform duration-300 group-hover:rotate-12" />
               </div>
               <span className="bg-linear-to-r from-primary via-purple-600 to-pink-500 bg-clip-text text-transparent font-extrabold">
                 IMS
