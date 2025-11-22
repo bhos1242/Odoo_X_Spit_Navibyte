@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { Prisma } from '@prisma/client'
 
 // --- Products ---
 
@@ -53,6 +54,11 @@ export async function createProduct(data: z.infer<typeof productSchema>) {
         return { success: true }
     } catch (error) {
         console.error(error)
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2002') {
+                return { success: false, error: `Product with this ${error.meta?.target} already exists` }
+            }
+        }
         return { success: false, error: 'Failed to create product' }
     }
 }
@@ -73,6 +79,12 @@ export async function updateProduct(id: string, data: z.infer<typeof productSche
         revalidatePath('/dashboard/inventory')
         return { success: true }
     } catch (error) {
+        console.error(error)
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2002') {
+                return { success: false, error: `Product with this ${error.meta?.target} already exists` }
+            }
+        }
         return { success: false, error: 'Failed to update product' }
     }
 }

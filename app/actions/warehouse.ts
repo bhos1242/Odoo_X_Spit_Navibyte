@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { Prisma } from '@prisma/client'
 
 // --- Warehouses ---
 
@@ -41,6 +42,11 @@ export async function createWarehouse(data: z.infer<typeof warehouseSchema>) {
         revalidatePath('/dashboard/warehouses')
         return { success: true }
     } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2002') {
+                return { success: false, error: `Warehouse with this ${error.meta?.target} already exists` }
+            }
+        }
         return { success: false, error: 'Failed to create warehouse' }
     }
 }
@@ -59,6 +65,11 @@ export async function updateWarehouse(id: string, data: z.infer<typeof warehouse
         revalidatePath('/dashboard/warehouses')
         return { success: true }
     } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2002') {
+                return { success: false, error: `Warehouse with this ${error.meta?.target} already exists` }
+            }
+        }
         return { success: false, error: 'Failed to update warehouse' }
     }
 }
@@ -141,6 +152,11 @@ export async function createLocation(data: z.infer<typeof locationSchema>) {
         return { success: true }
     } catch (error) {
         console.error(error)
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2002') {
+                return { success: false, error: `Location with this ${error.meta?.target} already exists` }
+            }
+        }
         return { success: false, error: 'Failed to create location' }
     }
 }
@@ -164,6 +180,11 @@ export async function updateLocation(id: string, data: z.infer<typeof locationSc
         revalidatePath('/dashboard/warehouses')
         return { success: true }
     } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2002') {
+                return { success: false, error: `Location with this ${error.meta?.target} already exists` }
+            }
+        }
         return { success: false, error: 'Failed to update location' }
     }
 }

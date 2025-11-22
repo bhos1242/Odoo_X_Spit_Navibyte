@@ -87,7 +87,11 @@ export function ProductDialog({
         toast.success("Product created");
         queryClient.invalidateQueries({ queryKey: ["products"] });
       } else {
-        toast.error("Failed to create product");
+        toast.error(
+          typeof result.error === "string"
+            ? result.error
+            : "Failed to create product"
+        );
         console.error(result.error);
       }
     },
@@ -107,7 +111,11 @@ export function ProductDialog({
         toast.success("Product updated");
         queryClient.invalidateQueries({ queryKey: ["products"] });
       } else {
-        toast.error("Failed to update product");
+        toast.error(
+          typeof result.error === "string"
+            ? result.error
+            : "Failed to update product"
+        );
         console.error(result.error);
       }
     },

@@ -113,7 +113,11 @@ export function CategoryDialog({
         toast.success("Category created");
         queryClient.invalidateQueries({ queryKey: ["categories"] });
       } else {
-        toast.error("Failed to create category");
+        toast.error(
+          typeof result.error === "string"
+            ? result.error
+            : "Failed to create category"
+        );
         console.error(result.error);
       }
     },
@@ -133,7 +137,11 @@ export function CategoryDialog({
         toast.success("Category updated");
         queryClient.invalidateQueries({ queryKey: ["categories"] });
       } else {
-        toast.error("Failed to update category");
+        toast.error(
+          typeof result.error === "string"
+            ? result.error
+            : "Failed to update category"
+        );
         console.error(result.error);
       }
     },

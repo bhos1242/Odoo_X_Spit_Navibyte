@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { Prisma } from "@prisma/client";
 
 export type Category = {
     id: string;
@@ -63,6 +64,14 @@ export async function createCategory(data: {
         return { success: true, data: category };
     } catch (error) {
         console.error("Failed to create category:", error);
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === "P2002") {
+                return {
+                    success: false,
+                    error: `Category with this ${error.meta?.target} already exists`,
+                };
+            }
+        }
         return { success: false, error: "Failed to create category" };
     }
 }
@@ -88,6 +97,14 @@ export async function updateCategory(
         return { success: true, data: category };
     } catch (error) {
         console.error("Failed to update category:", error);
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === "P2002") {
+                return {
+                    success: false,
+                    error: `Category with this ${error.meta?.target} already exists`,
+                };
+            }
+        }
         return { success: false, error: "Failed to update category" };
     }
 }
