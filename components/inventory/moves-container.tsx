@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { LayoutGrid, LayoutList, Plus, Search } from "lucide-react";
 import { MovesTable } from "./moves-table";
 import { MovesKanban } from "./moves-kanban";
+import { TransferDialog } from "@/components/operations/transfer-dialog";
 
 interface MovesContainerProps {
   moves: any[];
@@ -17,6 +18,7 @@ export function MovesContainer({ moves }: MovesContainerProps) {
   const searchParams = useSearchParams();
   const { replace } = useRouter();
   const [view, setView] = useState<"list" | "kanban">("list");
+  const [isNewMoveOpen, setIsNewMoveOpen] = useState(false);
 
   const handleSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams(searchParams);
@@ -32,10 +34,15 @@ export function MovesContainer({ moves }: MovesContainerProps) {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
-          <Button className="gap-2">
+          <Button className="gap-2" onClick={() => setIsNewMoveOpen(true)}>
             <Plus className="h-4 w-4" />
             NEW
           </Button>
+          <TransferDialog
+            open={isNewMoveOpen}
+            onOpenChange={setIsNewMoveOpen}
+            type="INTERNAL"
+          />
         </div>
         <div className="flex items-center gap-2">
           <div className="relative w-full sm:w-[300px]">
