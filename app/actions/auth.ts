@@ -47,7 +47,6 @@ export async function signUp(data: z.infer<typeof signUpSchema>) {
 
         const hashedPassword = await bcrypt.hash(password, 10)
 
-        console.log("Creating user...");
         await prisma.user.create({
             data: {
                 name,
