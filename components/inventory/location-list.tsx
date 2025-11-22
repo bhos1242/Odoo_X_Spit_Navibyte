@@ -42,10 +42,10 @@ interface Location {
   parentId?: string | null;
   warehouse?: {
     name: string;
-  };
+  } | null;
   parent?: {
     name: string;
-  };
+  } | null;
   createdAt: Date;
 }
 
