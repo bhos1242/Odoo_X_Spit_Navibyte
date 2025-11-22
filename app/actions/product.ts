@@ -10,7 +10,6 @@ import { Prisma } from '@prisma/client'
 const productSchema = z.object({
     name: z.string().min(2, "Name is required"),
     sku: z.string().min(2, "SKU is required"),
-    barcode: z.string().optional(),
     description: z.string().optional(),
     type: z.enum(['STORABLE', 'CONSUMABLE', 'SERVICE']),
     unitOfMeasure: z.string().default("Units"),
@@ -40,7 +39,6 @@ export async function getProducts() {
 
 export async function createProduct(data: z.infer<typeof productSchema>) {
     if (data.categoryId === 'none' || data.categoryId === '') data.categoryId = null;
-    if (data.barcode === '') data.barcode = undefined;
 
     const validated = productSchema.safeParse(data)
     if (!validated.success) {
@@ -66,7 +64,6 @@ export async function createProduct(data: z.infer<typeof productSchema>) {
 
 export async function updateProduct(id: string, data: z.infer<typeof productSchema>) {
     if (data.categoryId === 'none' || data.categoryId === '') data.categoryId = null;
-    if (data.barcode === '') data.barcode = undefined;
 
     const validated = productSchema.safeParse(data)
     if (!validated.success) {

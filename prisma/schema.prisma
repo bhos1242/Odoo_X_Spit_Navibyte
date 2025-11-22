@@ -59,7 +59,6 @@ model Product {
   id            String   @id @default(cuid())
   name          String
   sku           String   @unique
-  barcode       String?  @unique // Scannable barcode
   description   String?
   type          ProductType @default(STORABLE)
   
