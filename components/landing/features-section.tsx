@@ -113,12 +113,24 @@ export function FeaturesSection() {
       {/* Custom Animations */}
       <style jsx>{`
         @keyframes fade-in {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
         @keyframes fade-in-up {
-          from { opacity: 0; transform: translateY(30px); }
-          to { opacity: 1; transform: translateY(0); }
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
         .animate-fade-in {
           animation: fade-in 0.6s ease-out;
@@ -152,42 +164,53 @@ function FeatureCard({
   index: number;
 }) {
   return (
-    <Card 
+    <Card
       className="group relative overflow-hidden border border-border/50 bg-background/50 backdrop-blur-sm transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2 hover:border-primary/30 animate-fade-in-up"
-      style={{ animationDelay: `${index * 0.1}s` }}
+      style={{ animationDelay: `₹{index * 0.1}s` }}
     >
       {/* Gradient Overlay on Hover */}
-      <div className={`absolute inset-0 bg-linear-to-br ${gradient} via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
-      
+      <div
+        className={`absolute inset-0 bg-linear-to-br ${gradient} via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
+      ></div>
+
       {/* Shine Effect */}
       <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-linear-to-r from-transparent via-white/10 to-transparent"></div>
-      
+
       <CardHeader className="relative z-10 pb-3">
         {/* Icon Container with Advanced Styling */}
         <div className="relative mb-4 inline-flex">
           {/* Glow Effect */}
-          <div className={`absolute inset-0 ${bg} blur-xl opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-xl`}></div>
-          
+          <div
+            className={`absolute inset-0 ${bg} blur-xl opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-xl`}
+          ></div>
+
           {/* Icon Background */}
-          <div className={`relative h-14 w-14 flex items-center justify-center rounded-xl ${bg} ${hoverBg} ${color} transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-lg`}>
-            <Icon className="h-7 w-7 transition-transform duration-500 group-hover:scale-110" strokeWidth={2} />
+          <div
+            className={`relative h-14 w-14 flex items-center justify-center rounded-xl ${bg} ${hoverBg} ${color} transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-lg`}
+          >
+            <Icon
+              className="h-7 w-7 transition-transform duration-500 group-hover:scale-110"
+              strokeWidth={2}
+            />
           </div>
         </div>
-        
+
         <CardTitle className="text-lg sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300 flex items-center gap-2">
           {title}
           <ArrowRight className="h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
         </CardTitle>
       </CardHeader>
-      
+
       <CardContent className="relative z-10">
         <CardDescription className="text-sm sm:text-base leading-relaxed text-muted-foreground group-hover:text-muted-foreground/90">
           {description}
         </CardDescription>
       </CardContent>
-      
+
       {/* Bottom Border Accent */}
-      <div className={`absolute bottom-0 left-0 right-0 h-1 ${bg} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left`}></div>
+      <div
+        className={`absolute bottom-0 left-0 right-0 h-1 ${bg} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left`}
+      ></div>
     </Card>
   );
 }
