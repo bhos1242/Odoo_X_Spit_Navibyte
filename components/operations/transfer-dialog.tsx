@@ -305,7 +305,12 @@ export function TransferDialog({
                     render={({ field }) => (
                       <FormItem className="w-24">
                         <FormControl>
-                          <Input type="number" min="1" {...field} />
+                          <Input
+                            type="number"
+                            min="1"
+                            {...field}
+                            value={field.value as number}
+                          />
                         </FormControl>
                       </FormItem>
                     )}
