@@ -7,6 +7,11 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import {
   Card,
   CardContent,
   CardDescription,
@@ -57,6 +62,11 @@ export function ForgotPasswordForm() {
       email: "",
     },
   });
+
+  console.log(
+    `🚀 ~ forgot-password-form.tsx:61 ~ emailForm:`,
+    emailForm.formState.errors
+  );
 
   const resetForm = useForm<ResetValues>({
     resolver: zodResolver(resetSchema),
@@ -169,14 +179,14 @@ export function ForgotPasswordForm() {
                   <FormItem>
                     <FormLabel>OTP</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="1234"
-                        maxLength={4}
-                        type="text"
-                        autoComplete="one-time-code"
-                        autoFocus
-                        {...field}
-                      />
+                      <InputOTP maxLength={4} {...field}>
+                        <InputOTPGroup>
+                          <InputOTPSlot index={0} />
+                          <InputOTPSlot index={1} />
+                          <InputOTPSlot index={2} />
+                          <InputOTPSlot index={3} />
+                        </InputOTPGroup>
+                      </InputOTP>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
