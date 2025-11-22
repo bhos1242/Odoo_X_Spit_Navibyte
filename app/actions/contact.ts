@@ -42,3 +42,15 @@ export async function createContact(data: z.infer<typeof contactSchema>) {
         return { success: false, error: 'Failed to create contact' }
     }
 }
+
+export async function deleteContact(id: string) {
+    try {
+        await prisma.contact.delete({
+            where: { id }
+        })
+        revalidatePath('/dashboard/contacts')
+        return { success: true }
+    } catch (error) {
+        return { success: false, error: 'Failed to delete contact' }
+    }
+}
