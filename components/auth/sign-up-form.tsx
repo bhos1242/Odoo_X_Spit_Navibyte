@@ -24,6 +24,7 @@ import {
 import { toast } from "react-hot-toast";
 import { signUp } from "@/app/actions/auth";
 import Link from "next/link";
+import Image from "next/image";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
@@ -76,7 +77,16 @@ export function SignUpForm() {
 
   return (
     <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
+      <CardHeader className="space-y-1 flex flex-col items-center">
+        <div className="w-12 h-12 relative mb-2">
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            fill
+            className="object-contain"
+            priority
+          />
+        </div>
         <CardTitle>Sign Up</CardTitle>
         <CardDescription>
           Create an account to manage your inventory.
