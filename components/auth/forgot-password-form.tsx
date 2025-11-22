@@ -33,7 +33,7 @@ const emailSchema = z.object({
 
 const resetSchema = z
   .object({
-    otp: z.string().length(6, "OTP must be 6 digits"),
+    otp: z.string().length(4, "OTP must be 4 digits"),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string(),
   })
@@ -170,8 +170,8 @@ export function ForgotPasswordForm() {
                     <FormLabel>OTP</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="123456"
-                        maxLength={6}
+                        placeholder="1234"
+                        maxLength={4}
                         type="text"
                         autoComplete="one-time-code"
                         autoFocus
