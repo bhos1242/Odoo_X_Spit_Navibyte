@@ -2,11 +2,14 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { jwtVerify } from 'jose'
 
-const secretKey = process.env.SESSION_SECRET
+const secretKey = process.env.SESSION_SECRET || ''
 const encodedKey = new TextEncoder().encode(secretKey)
 
 export async function proxy(request: NextRequest) {
+    console.log(`[Proxy] ${request.method} ${request.nextUrl.pathname}`)
     const session = request.cookies.get('session')?.value
+    console.log(`[Proxy] Session cookie: ${session ? 'Present' : 'Missing'}`)
+
     const isDashboard = request.nextUrl.pathname.startsWith('/dashboard')
     const isAuthPage = request.nextUrl.pathname.startsWith('/sign-in') || request.nextUrl.pathname.startsWith('/sign-up')
 
