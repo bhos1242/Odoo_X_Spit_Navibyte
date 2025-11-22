@@ -13,9 +13,12 @@ const signUpSchema = z.object({
 })
 
 export async function signUp(data: z.infer<typeof signUpSchema>) {
+    console.log("signUp action called with data:", JSON.stringify(data, null, 2));
+    
     const validatedFields = signUpSchema.safeParse(data)
 
     if (!validatedFields.success) {
+        console.error("Validation failed:", validatedFields.error.flatten().fieldErrors);
         return {
             errors: validatedFields.error.flatten().fieldErrors,
         }
@@ -24,18 +27,27 @@ export async function signUp(data: z.infer<typeof signUpSchema>) {
     const { name, email, password, role } = validatedFields.data
 
     try {
+        console.log("Checking for existing user...");
+        if (!prisma) {
+            console.error("Prisma instance is undefined!");
+            throw new Error("Prisma instance is undefined");
+        }
+        
         const existingUser = await prisma.user.findUnique({
             where: { email },
         })
 
         if (existingUser) {
+            console.log("User already exists.");
             return {
                 message: 'User already exists with this email.',
             }
         }
 
+        console.log("Hashing password...");
         const hashedPassword = await bcrypt.hash(password, 10)
 
+        console.log("Creating user...");
         await prisma.user.create({
             data: {
                 name,
@@ -44,10 +56,12 @@ export async function signUp(data: z.infer<typeof signUpSchema>) {
                 role: role as any || 'STAFF',
             },
         })
-
+        
+        console.log("User created successfully.");
         return { success: true }
 
     } catch (error) {
+        console.error("Error in signUp action:", error);
         return {
             message: 'Database Error: Failed to create user.',
         }
