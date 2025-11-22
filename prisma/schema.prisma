@@ -22,136 +22,171 @@ enum UserRole {
 }
 
 model User {
-  id             String    @id @default(cuid())
-  email          String    @unique
-  password       String // Hashed password
-  name           String?
-  role           UserRole  @default(STAFF)
-  otp            String? // For password reset
-  otpExpiry      DateTime?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id        String    @id @default(cuid())
+  email     String    @unique
+  password  String // Hashed password
+  name      String?
+  role      UserRole  @default(STAFF)
+  otp       String? // For password reset
+  otpExpiry DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  categories  Category[]
+  products    Product[]
+  warehouses  Warehouse[]
+  locations   Location[]
+  stockLevels StockLevel[]
+  contacts    Contact[]
+  transfers   StockTransfer[]
+  moves       StockMove[]
 }
 
 // Product Management
 model Category {
-  id          String    @id @default(cuid())
-  name        String    @unique
+  id          String  @id @default(cuid())
+  name        String
   description String?
-  
-  // Hierarchy: Parent Category
-  parentId    String?
-  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
-  children    Category[] @relation("CategoryHierarchy")
 
-  products    Product[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  // Hierarchy: Parent Category
+  parentId String?
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+
+  products Product[]
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, userId])
 }
 
 enum ProductType {
-  STORABLE   // Track stock
+  STORABLE // Track stock
   CONSUMABLE // Don't track stock, but allow reception/delivery
-  SERVICE    // No stock, no delivery
+  SERVICE // No stock, no delivery
 }
 
 model Product {
-  id            String   @id @default(cuid())
-  name          String
-  sku           String   @unique
-  description   String?
-  type          ProductType @default(STORABLE)
-  
-  unitOfMeasure String   @default("Units") // e.g., kg, pcs, m
-  
-  costPrice     Decimal  @default(0.00)
-  salesPrice    Decimal  @default(0.00)
+  id          String      @id @default(cuid())
+  name        String
+  sku         String
+  description String?
+  type        ProductType @default(STORABLE)
 
-  categoryId    String?
-  category      Category? @relation(fields: [categoryId], references: [id])
+  unitOfMeasure String @default("Units") // e.g., kg, pcs, m
 
-  minStock      Int      @default(0) // Reordering rule
-  maxStock      Int?     // Reordering rule
-  
-  image         String?  // URL or base64
+  costPrice  Decimal @default(0.00)
+  salesPrice Decimal @default(0.00)
 
-  stockLevels   StockLevel[]
-  stockMoves    StockMove[]
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  minStock Int  @default(0) // Reordering rule
+  maxStock Int? // Reordering rule
+
+  image String? // URL or base64
+
+  stockLevels StockLevel[]
+  stockMoves  StockMove[]
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sku, userId])
 }
 
 // Warehouse & Locations
 model Warehouse {
   id        String     @id @default(cuid())
   name      String
-  shortCode String     @unique // e.g. WH
+  shortCode String // e.g. WH
   address   String?
   locations Location[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([shortCode, userId])
 }
 
 enum LocationType {
-  VIEW           // Generic parent location (e.g. "Warehouse A")
-  INTERNAL       // Standard stock location (e.g. "Shelf 1")
-  CUSTOMER       // Goods sent to customers
-  VENDOR         // Goods received from vendors
+  VIEW // Generic parent location (e.g. "Warehouse A")
+  INTERNAL // Standard stock location (e.g. "Shelf 1")
+  CUSTOMER // Goods sent to customers
+  VENDOR // Goods received from vendors
   INVENTORY_LOSS // For adjustments/scrapping
-  PRODUCTION     // Manufacturing location
-  TRANSIT        // Inter-warehouse transit
+  PRODUCTION // Manufacturing location
+  TRANSIT // Inter-warehouse transit
 }
 
 model Location {
-  id          String       @id @default(cuid())
-  name        String
-  shortCode   String       @unique // e.g. WH/STOCK
-  type        LocationType @default(INTERNAL)
-  
+  id        String       @id @default(cuid())
+  name      String
+  shortCode String // e.g. WH/STOCK
+  type      LocationType @default(INTERNAL)
+
   // Hierarchy: Parent Location (e.g., Warehouse -> Zone -> Rack -> Shelf)
-  parentId    String?
-  parent      Location?    @relation("LocationHierarchy", fields: [parentId], references: [id])
-  children    Location[]   @relation("LocationHierarchy")
+  parentId String?
+  parent   Location?  @relation("LocationHierarchy", fields: [parentId], references: [id])
+  children Location[] @relation("LocationHierarchy")
 
   warehouseId String?
-  warehouse   Warehouse?   @relation(fields: [warehouseId], references: [id])
+  warehouse   Warehouse? @relation(fields: [warehouseId], references: [id])
 
   stockLevels StockLevel[]
 
   // Relations for moves
-  movesFrom   StockMove[]  @relation("SourceLocation")
-  movesTo     StockMove[]  @relation("DestinationLocation")
+  movesFrom StockMove[] @relation("SourceLocation")
+  movesTo   StockMove[] @relation("DestinationLocation")
 
   // Relations for transfers
   transfersFrom StockTransfer[] @relation("SourceLocation")
   transfersTo   StockTransfer[] @relation("DestinationLocation")
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([shortCode, userId])
 }
 
 // Current Stock (Quants)
 model StockLevel {
-  id         String   @id @default(cuid())
-  productId  String
-  product    Product  @relation(fields: [productId], references: [id])
-  
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
   locationId String
   location   Location @relation(fields: [locationId], references: [id])
-  
-  quantity   Int      @default(0)
 
-  updatedAt  DateTime @updatedAt
+  quantity Int @default(0)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  updatedAt DateTime @updatedAt
 
   @@unique([productId, locationId]) // Unique stock record per product per location
 }
 
 // Operations
 enum TransferType {
-  INCOMING   // Receipt
-  OUTGOING   // Delivery
-  INTERNAL   // Internal Transfer
+  INCOMING // Receipt
+  OUTGOING // Delivery
+  INTERNAL // Internal Transfer
   ADJUSTMENT // Inventory Adjustment
 }
 
@@ -171,8 +206,12 @@ model Contact {
   type      ContactType     @default(CUSTOMER)
   address   String?
   transfers StockTransfer[]
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum ContactType {
@@ -182,49 +221,57 @@ enum ContactType {
 
 // The "Document" (Receipt, Delivery Order, etc.)
 model StockTransfer {
-  id                    String         @id @default(cuid())
-  reference             String         @unique // e.g., WH/IN/0001
-  origin                String?        // Source document (e.g., PO001, SO002)
-  type                  TransferType
-  status                TransferStatus @default(DRAFT)
+  id        String         @id @default(cuid())
+  reference String // e.g., WH/IN/0001
+  origin    String? // Source document (e.g., PO001, SO002)
+  type      TransferType
+  status    TransferStatus @default(DRAFT)
 
-  sourceLocationId      String?
-  sourceLocation        Location?      @relation("SourceLocation", fields: [sourceLocationId], references: [id])
+  sourceLocationId String?
+  sourceLocation   Location? @relation("SourceLocation", fields: [sourceLocationId], references: [id])
 
   destinationLocationId String?
-  destinationLocation   Location?      @relation("DestinationLocation", fields: [destinationLocationId], references: [id])
+  destinationLocation   Location? @relation("DestinationLocation", fields: [destinationLocationId], references: [id])
 
-  contactId             String?
-  contact               Contact?       @relation(fields: [contactId], references: [id])
+  contactId String?
+  contact   Contact? @relation(fields: [contactId], references: [id])
 
-  scheduledDate         DateTime?
-  effectiveDate         DateTime?      // When it actually happened
-  
-  stockMoves            StockMove[]
+  scheduledDate DateTime?
+  effectiveDate DateTime? // When it actually happened
 
-  createdAt             DateTime       @default(now())
-  updatedAt             DateTime       @updatedAt
+  stockMoves StockMove[]
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([reference, userId])
 }
 
 // The individual lines in a transfer
 model StockMove {
-  id                    String         @id @default(cuid())
-  transferId            String?
-  transfer              StockTransfer? @relation(fields: [transferId], references: [id])
+  id         String         @id @default(cuid())
+  transferId String?
+  transfer   StockTransfer? @relation(fields: [transferId], references: [id])
 
-  productId             String
-  product               Product        @relation(fields: [productId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
 
-  quantity              Int
+  quantity Int
 
-  sourceLocationId      String?
-  sourceLocation        Location?      @relation("SourceLocation", fields: [sourceLocationId], references: [id])
+  sourceLocationId String?
+  sourceLocation   Location? @relation("SourceLocation", fields: [sourceLocationId], references: [id])
 
   destinationLocationId String?
-  destinationLocation   Location?      @relation("DestinationLocation", fields: [destinationLocationId], references: [id])
+  destinationLocation   Location? @relation("DestinationLocation", fields: [destinationLocationId], references: [id])
 
-  status                TransferStatus @default(DRAFT)
+  status TransferStatus @default(DRAFT)
 
-  createdAt             DateTime       @default(now())
-  updatedAt             DateTime       @updatedAt
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
