@@ -185,7 +185,7 @@ export function Sidebar({ className }: SidebarProps) {
 
   return (
     <div
-      className={cn("flex flex-col h-screen border-r bg-background", className)}
+      className={cn("flex flex-col h-full bg-background", className)}
     >
       {/* Header */}
       <div className="p-6 flex items-center gap-3 border-b">

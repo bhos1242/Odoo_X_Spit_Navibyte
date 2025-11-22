@@ -20,9 +20,9 @@ export default function DashboardLayoutClient({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-muted/40 md:flex-row">
+    <div className="flex h-screen w-full overflow-hidden bg-muted/40">
       {/* Desktop Sidebar */}
-      <aside className="hidden w-64 flex-col md:flex shrink-0">
+      <aside className="hidden w-64 flex-col border-r bg-background md:flex shrink-0">
         <Sidebar />
       </aside>
 
@@ -41,15 +41,16 @@ export default function DashboardLayoutClient({
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <Sidebar />
+        <Sidebar className="border-r" />
       </div>
 
-      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14 md:pl-0 flex-1 min-w-0">
+      {/* Main Content Area */}
+      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <Header
           user={user}
           onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)}
         />
-        <main className="flex flex-col flex-1 gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 min-w-0">
+        <main className="flex-1 overflow-y-auto p-4 sm:px-6 md:p-8">
           {children}
         </main>
       </div>
