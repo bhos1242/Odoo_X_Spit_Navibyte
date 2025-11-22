@@ -6,7 +6,9 @@
     "dev": "next dev --port 8000",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "clean": "npx rimraf node_modules .next pnpm-lock.yaml && pnpm install",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
