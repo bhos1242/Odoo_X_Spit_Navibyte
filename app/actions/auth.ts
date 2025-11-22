@@ -160,8 +160,8 @@ export async function forgotPassword(prevState: any, formData: FormData) {
             }
         }
 
-        // Generate 6 digit OTP
-        const otp = Math.floor(100000 + Math.random() * 900000).toString()
+        // Generate 4 digit OTP
+        const otp = Math.floor(1000 + Math.random() * 9000).toString()
         const otpExpiry = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
 
         await prisma.user.update({
@@ -210,7 +210,7 @@ export async function forgotPassword(prevState: any, formData: FormData) {
 
 const resetPasswordSchema = z.object({
     email: z.string().email(),
-    otp: z.string().length(6, 'OTP must be 6 digits'),
+    otp: z.string().length(4, 'OTP must be 4 digits'),
     password: z.string().min(6, 'Password must be at least 6 characters'),
     confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
