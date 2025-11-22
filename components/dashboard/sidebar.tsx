@@ -184,9 +184,7 @@ export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <div
-      className={cn("flex flex-col h-full bg-background", className)}
-    >
+    <div className={cn("flex flex-col h-full bg-background", className)}>
       {/* Header */}
       <div className="p-6 flex items-center gap-3 border-b">
         <div className="relative h-8 w-8 shrink-0">
