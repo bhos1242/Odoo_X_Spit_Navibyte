@@ -11,39 +11,88 @@ import {
   Users,
   Settings,
   LogOut,
+  History,
+  ClipboardList,
+  Truck,
+  Container,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const sidebarItems = [
+const sidebarGroups = [
   {
-    title: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Inventory",
-    href: "/dashboard/inventory",
-    icon: Package,
+    title: "Overview",
+    items: [
+      {
+        title: "Dashboard",
+        href: "/dashboard",
+        icon: LayoutDashboard,
+      },
+    ],
   },
   {
     title: "Operations",
-    href: "/dashboard/operations",
-    icon: ArrowRightLeft,
+    items: [
+      {
+        title: "Receipts",
+        href: "/dashboard/operations/receipts",
+        icon: Container,
+      },
+      {
+        title: "Deliveries",
+        href: "/dashboard/operations/deliveries",
+        icon: Truck,
+      },
+      {
+        title: "All Operations",
+        href: "/dashboard/operations",
+        icon: ArrowRightLeft,
+      },
+    ],
   },
   {
-    title: "Warehouses",
-    href: "/dashboard/warehouses",
-    icon: Warehouse,
+    title: "Inventory",
+    items: [
+      {
+        title: "Products",
+        href: "/dashboard/inventory",
+        icon: Package,
+      },
+      {
+        title: "Warehouses",
+        href: "/dashboard/warehouses",
+        icon: Warehouse,
+      },
+    ],
   },
   {
-    title: "Users",
-    href: "/dashboard/users",
-    icon: Users,
+    title: "Reporting",
+    items: [
+      {
+        title: "Stock Moves",
+        href: "/dashboard/moves",
+        icon: History,
+      },
+      {
+        title: "Current Stock",
+        href: "/dashboard/stock",
+        icon: ClipboardList,
+      },
+    ],
   },
   {
-    title: "Settings",
-    href: "/dashboard/settings",
-    icon: Settings,
+    title: "Configuration",
+    items: [
+      {
+        title: "Users",
+        href: "/dashboard/users",
+        icon: Users,
+      },
+      {
+        title: "Settings",
+        href: "/dashboard/settings",
+        icon: Settings,
+      },
+    ],
   },
 ];
 
@@ -61,19 +110,28 @@ export function Sidebar({ className }: SidebarProps) {
           <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
             IMS
           </h2>
-          <div className="space-y-1">
-            {sidebarItems.map((item) => (
-              <Button
-                key={item.href}
-                variant={pathname === item.href ? "secondary" : "ghost"}
-                className="w-full justify-start"
-                asChild
-              >
-                <Link href={item.href as any}>
-                  <item.icon className="mr-2 h-4 w-4" />
-                  {item.title}
-                </Link>
-              </Button>
+          <div className="space-y-4">
+            {sidebarGroups.map((group) => (
+              <div key={group.title} className="px-3 py-2">
+                <h3 className="mb-2 px-4 text-xs font-semibold uppercase text-muted-foreground tracking-wider">
+                  {group.title}
+                </h3>
+                <div className="space-y-1">
+                  {group.items.map((item) => (
+                    <Button
+                      key={item.href}
+                      variant={pathname === item.href ? "secondary" : "ghost"}
+                      className="w-full justify-start"
+                      asChild
+                    >
+                      <Link href={item.href as any}>
+                        <item.icon className="mr-2 h-4 w-4" />
+                        {item.title}
+                      </Link>
+                    </Button>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </div>
