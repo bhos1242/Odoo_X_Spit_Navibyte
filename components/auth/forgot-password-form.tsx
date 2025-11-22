@@ -7,6 +7,11 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import {
   Card,
   CardContent,
   CardDescription,
@@ -49,72 +54,6 @@ type ResetValues = z.infer<typeof resetSchema>;
 export function ForgotPasswordForm() {
   const [step, setStep] = useState<"EMAIL" | "OTP">("EMAIL");
   const [email, setEmail] = useState("");
-  const [isPending, startTransition] = useTransition();
-  const router = useRouter();
-
-  const emailForm = useForm<EmailValues>({
-    resolver: zodResolver(emailSchema),
-    defaultValues: {
-      email: "",
-    },
-  });
-
-  const resetForm = useForm<ResetValues>({
-    resolver: zodResolver(resetSchema),
-    defaultValues: {
-      otp: "",
-      password: "",
-      confirmPassword: "",
-    },
-  });
-
-  function onEmailSubmit(values: EmailValues) {
-    startTransition(async () => {
-      const formData = new FormData();
-      formData.append("email", values.email);
-
-      const result = await forgotPassword(null, formData);
-
-      if (result?.errors) {
-        Object.entries(result.errors).forEach(([key, errors]) => {
-          emailForm.setError(key as any, { message: errors[0] });
-        });
-      } else if (result?.message) {
-        if (result.success) {
-          toast.success(result.message);
-          setEmail(values.email);
-          setStep("OTP");
-        } else {
-          toast.error(result.message);
-        }
-      }
-    });
-  }
-
-  function onResetSubmit(values: ResetValues) {
-    startTransition(async () => {
-      const formData = new FormData();
-      formData.append("email", email);
-      formData.append("otp", values.otp);
-      formData.append("password", values.password);
-      formData.append("confirmPassword", values.confirmPassword);
-
-      const result = await resetPassword(null, formData);
-
-      if (result?.errors) {
-        Object.entries(result.errors).forEach(([key, errors]) => {
-          resetForm.setError(key as any, { message: errors[0] });
-        });
-      } else if (result?.message) {
-        if (result.success) {
-          toast.success(result.message);
-          router.push("/sign-in");
-        } else {
-          toast.error(result.message);
-        }
-      }
-    });
-  }
 
   return (
     <Card className="w-full max-w-md mx-auto relative overflow-hidden border border-border/50 bg-background/80 backdrop-blur-xl shadow-2xl">
@@ -159,167 +98,14 @@ export function ForgotPasswordForm() {
 
       <CardContent className="relative z-10">
         {step === "EMAIL" ? (
-          <Form {...emailForm}>
-            <form
-              onSubmit={emailForm.handleSubmit(onEmailSubmit)}
-              className="space-y-5"
-            >
-              <FormField
-                control={emailForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-semibold">Email Address</FormLabel>
-                    <FormControl>
-                      <div className="relative group">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                        <Input
-                          placeholder="john@example.com"
-                          type="email"
-                          className="pl-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
-                          {...field}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Info Box */}
-              <div className="bg-muted/30 rounded-lg p-4 border border-border/50">
-                <p className="text-xs text-muted-foreground">
-                  💡 <strong>Quick tip:</strong> Check your spam folder if you don't see the OTP in your inbox within a few minutes.
-                </p>
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full h-11 bg-linear-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover:scale-[1.02] font-semibold group"
-                disabled={isPending}
-              >
-                {isPending ? (
-                  <>
-                    <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                    Sending OTP...
-                  </>
-                ) : (
-                  <>
-                    Send Recovery Code
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </>
-                )}
-              </Button>
-            </form>
-          </Form>
+          <EmailForm
+            onSuccess={(email) => {
+              setEmail(email);
+              setStep("OTP");
+            }}
+          />
         ) : (
-          <Form {...resetForm}>
-            <form
-              onSubmit={resetForm.handleSubmit(onResetSubmit)}
-              className="space-y-5"
-            >
-              <FormField
-                control={resetForm.control}
-                name="otp"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-semibold">Verification Code</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input
-                          placeholder="1234"
-                          maxLength={4}
-                          type="text"
-                          inputMode="numeric"
-                          pattern="[0-9]*"
-                          autoComplete="one-time-code"
-                          autoFocus
-                          className="h-12 border-border/50 focus:border-primary/50 bg-background/50 transition-all text-center text-2xl tracking-[0.5em] font-mono font-bold"
-                          {...field}
-                        />
-                        <div className="absolute -bottom-6 left-0 right-0 flex justify-center">
-                          <KeyRound className="h-3 w-3 text-muted-foreground" />
-                        </div>
-                      </div>
-                    </FormControl>
-                    <FormMessage className="mt-7" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={resetForm.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-semibold">New Password</FormLabel>
-                    <FormControl>
-                      <div className="relative group">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                        <Input
-                          placeholder="••••••••"
-                          type="password"
-                          className="pl-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
-                          {...field}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={resetForm.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-semibold">Confirm New Password</FormLabel>
-                    <FormControl>
-                      <div className="relative group">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                        <Input
-                          placeholder="••••••••"
-                          type="password"
-                          className="pl-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
-                          {...field}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                    <p className="text-xs text-muted-foreground mt-1.5">
-                      Must be at least 6 characters long
-                    </p>
-                  </FormItem>
-                )}
-              />
-              <Button
-                type="submit"
-                className="w-full h-11 bg-linear-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover:scale-[1.02] font-semibold group"
-                disabled={isPending}
-              >
-                {isPending ? (
-                  <>
-                    <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                    Resetting Password...
-                  </>
-                ) : (
-                  <>
-                    Reset Password
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </>
-                )}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full h-11 hover:bg-muted/50 transition-colors group"
-                onClick={() => setStep("EMAIL")}
-                disabled={isPending}
-              >
-                <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                Back to Email
-              </Button>
-            </form>
-          </Form>
+          <ResetForm email={email} onBack={() => setStep("EMAIL")} />
         )}
       </CardContent>
 
@@ -335,5 +121,241 @@ export function ForgotPasswordForm() {
         </p>
       </CardFooter>
     </Card>
+  );
+}
+
+function EmailForm({ onSuccess }: { onSuccess: (email: string) => void }) {
+  const [isPending, startTransition] = useTransition();
+  const emailForm = useForm<EmailValues>({
+    resolver: zodResolver(emailSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
+
+  function onEmailSubmit(values: EmailValues) {
+    startTransition(async () => {
+      const formData = new FormData();
+      formData.append("email", values.email);
+
+      const result = await forgotPassword(null, formData);
+
+      if (result?.errors) {
+        Object.entries(result.errors).forEach(([key, errors]) => {
+          emailForm.setError(key as any, { message: errors[0] });
+        });
+      } else if (result?.message) {
+        if (result.success) {
+          toast.success(result.message);
+          onSuccess(values.email);
+        } else {
+          toast.error(result.message);
+        }
+      }
+    });
+  }
+
+  return (
+    <Form {...emailForm}>
+      <form
+        onSubmit={emailForm.handleSubmit(onEmailSubmit)}
+        className="space-y-5"
+      >
+        <FormField
+          control={emailForm.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-sm font-semibold">Email Address</FormLabel>
+              <FormControl>
+                <div className="relative group">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <Input
+                    placeholder="john@example.com"
+                    type="email"
+                    className="pl-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
+                    {...field}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Info Box */}
+        <div className="bg-muted/30 rounded-lg p-4 border border-border/50">
+          <p className="text-xs text-muted-foreground">
+            💡 <strong>Quick tip:</strong> Check your spam folder if you don't see the OTP in your inbox within a few minutes.
+          </p>
+        </div>
+
+        <Button
+          type="submit"
+          className="w-full h-11 bg-linear-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover:scale-[1.02] font-semibold group"
+          disabled={isPending}
+        >
+          {isPending ? (
+            <>
+              <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+              Sending OTP...
+            </>
+          ) : (
+            <>
+              Send Recovery Code
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </>
+          )}
+        </Button>
+      </form>
+    </Form>
+  );
+}
+
+function ResetForm({ email, onBack }: { email: string; onBack: () => void }) {
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+  const resetForm = useForm<ResetValues>({
+    resolver: zodResolver(resetSchema),
+    defaultValues: {
+      otp: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
+
+  function onResetSubmit(values: ResetValues) {
+    startTransition(async () => {
+      const formData = new FormData();
+      formData.append("email", email);
+      formData.append("otp", values.otp);
+      formData.append("password", values.password);
+      formData.append("confirmPassword", values.confirmPassword);
+
+      const result = await resetPassword(null, formData);
+
+      if (result?.errors) {
+        Object.entries(result.errors).forEach(([key, errors]) => {
+          resetForm.setError(key as any, { message: errors[0] });
+        });
+      } else if (result?.message) {
+        if (result.success) {
+          toast.success(result.message);
+          router.push("/sign-in");
+        } else {
+          toast.error(result.message);
+        }
+      }
+    });
+  }
+
+  return (
+    <Form {...resetForm}>
+      <form
+        onSubmit={resetForm.handleSubmit(onResetSubmit)}
+        className="space-y-5"
+      >
+        <FormField
+          control={resetForm.control}
+          name="otp"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-sm font-semibold">Verification Code</FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <Input
+                    placeholder="1234"
+                    maxLength={4}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    autoComplete="one-time-code"
+                    autoFocus
+                    className="h-12 border-border/50 focus:border-primary/50 bg-background/50 transition-all text-center text-2xl tracking-[0.5em] font-mono font-bold"
+                    {...field}
+                  />
+                  <div className="absolute -bottom-6 left-0 right-0 flex justify-center">
+                    <KeyRound className="h-3 w-3 text-muted-foreground" />
+                  </div>
+                </div>
+              </FormControl>
+              <FormMessage className="mt-7" />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={resetForm.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-sm font-semibold">New Password</FormLabel>
+              <FormControl>
+                <div className="relative group">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <Input
+                    placeholder="••••••••"
+                    type="password"
+                    className="pl-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
+                    {...field}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={resetForm.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-sm font-semibold">Confirm New Password</FormLabel>
+              <FormControl>
+                <div className="relative group">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <Input
+                    placeholder="••••••••"
+                    type="password"
+                    className="pl-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
+                    {...field}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+              <p className="text-xs text-muted-foreground mt-1.5">
+                Must be at least 6 characters long
+              </p>
+            </FormItem>
+          )}
+        />
+        <Button
+          type="submit"
+          className="w-full h-11 bg-linear-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover:scale-[1.02] font-semibold group"
+          disabled={isPending}
+        >
+          {isPending ? (
+            <>
+              <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+              Resetting Password...
+            </>
+          ) : (
+            <>
+              Reset Password
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </>
+          )}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          className="w-full h-11 hover:bg-muted/50 transition-colors group"
+          onClick={onBack}
+          disabled={isPending}
+        >
+          <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
+          Back to Email
+        </Button>
+      </form>
+    </Form>
   );
 }
