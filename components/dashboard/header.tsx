@@ -21,12 +21,12 @@ export function Header({ onMenuClick }: HeaderProps) {
       </Button>
       <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
         <div className="ml-auto flex-1 sm:flex-initial">
-           {/* Search or other header items could go here */}
+          {/* Search or other header items could go here */}
         </div>
         <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-muted/50 flex items-center justify-center">
-                <span className="text-xs font-medium">U</span>
-            </div>
+          <div className="h-8 w-8 rounded-full bg-muted/50 flex items-center justify-center">
+            <span className="text-xs font-medium">U</span>
+          </div>
         </div>
       </div>
     </header>

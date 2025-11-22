@@ -77,10 +77,13 @@ export function Sidebar({ className }: SidebarProps) {
         </div>
       </div>
       <div className="absolute bottom-4 px-3 w-full">
-         <Button variant="ghost" className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50">
-            <LogOut className="mr-2 h-4 w-4" />
-            Sign Out
-         </Button>
+        <Button
+          variant="ghost"
+          className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          Sign Out
+        </Button>
       </div>
     </div>
   );

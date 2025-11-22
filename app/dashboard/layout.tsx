@@ -21,17 +21,19 @@ export default function DashboardLayout({
 
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
-        <div 
-            className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden"
-            onClick={() => setIsSidebarOpen(false)}
+        <div
+          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
         />
       )}
-      
+
       {/* Mobile Sidebar */}
-      <div className={cn(
+      <div
+        className={cn(
           "fixed inset-y-0 left-0 z-50 w-64 bg-background transition-transform duration-300 ease-in-out md:hidden",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-      )}>
+        )}
+      >
         <Sidebar />
       </div>
 
