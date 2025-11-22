@@ -31,6 +31,7 @@ import toast from "react-hot-toast";
 import { forgotPassword, resetPassword } from "@/app/actions/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Box, Mail, Lock, KeyRound, ArrowRight, Shield, ArrowLeft } from "lucide-react";
 
 const emailSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -55,18 +56,47 @@ export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle>
-          {step === "EMAIL" ? "Forgot Password" : "Reset Password"}
-        </CardTitle>
-        <CardDescription>
-          {step === "EMAIL"
-            ? "Enter your email to receive a password reset OTP."
-            : `Enter the OTP sent to ${email} and your new password.`}
-        </CardDescription>
+    <Card className="w-full max-w-md mx-auto relative overflow-hidden border border-border/50 bg-background/80 backdrop-blur-xl shadow-2xl">
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-purple-500/5 pointer-events-none"></div>
+      
+      {/* Shine Effect */}
+      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-linear-to-r from-transparent via-white/5 to-transparent pointer-events-none"></div>
+
+      <CardHeader className="space-y-3 flex flex-col items-center text-center relative z-10 pb-8">
+        {/* Logo */}
+        <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-primary to-purple-600 text-white shadow-xl shadow-primary/25 mb-2 group hover:scale-110 transition-transform duration-300">
+          <Box className="h-8 w-8 transition-transform duration-300 group-hover:rotate-12" />
+          <div className="absolute inset-0 rounded-2xl bg-linear-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        </div>
+
+        {/* Title with Icon Badge */}
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-2">
+            {step === "EMAIL" ? (
+              <>
+                <Shield className="h-3 w-3 text-primary" />
+                <span className="text-xs font-semibold text-primary">Secure Recovery</span>
+              </>
+            ) : (
+              <>
+                <KeyRound className="h-3 w-3 text-primary" />
+                <span className="text-xs font-semibold text-primary">Reset Password</span>
+              </>
+            )}
+          </div>
+          <CardTitle className="text-2xl md:text-3xl font-extrabold bg-linear-to-r from-foreground to-foreground/70 bg-clip-text">
+            {step === "EMAIL" ? "Forgot Password?" : "Create New Password"}
+          </CardTitle>
+          <CardDescription className="text-base">
+            {step === "EMAIL"
+              ? "No worries! Enter your email to receive a secure OTP."
+              : `Enter the 4-digit code sent to ${email}`}
+          </CardDescription>
+        </div>
       </CardHeader>
-      <CardContent>
+
+      <CardContent className="relative z-10">
         {step === "EMAIL" ? (
           <EmailForm
             onSuccess={(email) => {
@@ -78,10 +108,17 @@ export function ForgotPasswordForm() {
           <ResetForm email={email} onBack={() => setStep("EMAIL")} />
         )}
       </CardContent>
-      <CardFooter className="flex justify-center">
-        <Link href="/sign-in" className="text-sm text-primary hover:underline">
-          Back to Sign In
-        </Link>
+
+      <CardFooter className="flex justify-center relative z-10 pt-6 border-t border-border/50">
+        <p className="text-sm text-muted-foreground">
+          Remember your password?{" "}
+          <Link
+            href="/sign-in"
+            className="font-semibold text-primary hover:underline transition-colors"
+          >
+            Sign in
+          </Link>
+        </p>
       </CardFooter>
     </Card>
   );
@@ -122,23 +159,53 @@ function EmailForm({ onSuccess }: { onSuccess: (email: string) => void }) {
     <Form {...emailForm}>
       <form
         onSubmit={emailForm.handleSubmit(onEmailSubmit)}
-        className="space-y-4"
+        className="space-y-5"
       >
         <FormField
           control={emailForm.control}
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel className="text-sm font-semibold">Email Address</FormLabel>
               <FormControl>
-                <Input placeholder="john@example.com" type="email" {...field} />
+                <div className="relative group">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <Input
+                    placeholder="john@example.com"
+                    type="email"
+                    className="pl-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
+                    {...field}
+                  />
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={isPending}>
-          {isPending ? "Sending OTP..." : "Send OTP"}
+
+        {/* Info Box */}
+        <div className="bg-muted/30 rounded-lg p-4 border border-border/50">
+          <p className="text-xs text-muted-foreground">
+            💡 <strong>Quick tip:</strong> Check your spam folder if you don't see the OTP in your inbox within a few minutes.
+          </p>
+        </div>
+
+        <Button
+          type="submit"
+          className="w-full h-11 bg-linear-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover:scale-[1.02] font-semibold group"
+          disabled={isPending}
+        >
+          {isPending ? (
+            <>
+              <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+              Sending OTP...
+            </>
+          ) : (
+            <>
+              Send Recovery Code
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </>
+          )}
         </Button>
       </form>
     </Form>
@@ -186,25 +253,33 @@ function ResetForm({ email, onBack }: { email: string; onBack: () => void }) {
     <Form {...resetForm}>
       <form
         onSubmit={resetForm.handleSubmit(onResetSubmit)}
-        className="space-y-4"
+        className="space-y-5"
       >
         <FormField
           control={resetForm.control}
           name="otp"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>OTP</FormLabel>
+              <FormLabel className="text-sm font-semibold">Verification Code</FormLabel>
               <FormControl>
-                <InputOTP maxLength={4} {...field}>
-                  <InputOTPGroup>
-                    <InputOTPSlot index={0} />
-                    <InputOTPSlot index={1} />
-                    <InputOTPSlot index={2} />
-                    <InputOTPSlot index={3} />
-                  </InputOTPGroup>
-                </InputOTP>
+                <div className="relative">
+                  <Input
+                    placeholder="1234"
+                    maxLength={4}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    autoComplete="one-time-code"
+                    autoFocus
+                    className="h-12 border-border/50 focus:border-primary/50 bg-background/50 transition-all text-center text-2xl tracking-[0.5em] font-mono font-bold"
+                    {...field}
+                  />
+                  <div className="absolute -bottom-6 left-0 right-0 flex justify-center">
+                    <KeyRound className="h-3 w-3 text-muted-foreground" />
+                  </div>
+                </div>
               </FormControl>
-              <FormMessage />
+              <FormMessage className="mt-7" />
             </FormItem>
           )}
         />
@@ -213,9 +288,17 @@ function ResetForm({ email, onBack }: { email: string; onBack: () => void }) {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>New Password</FormLabel>
+              <FormLabel className="text-sm font-semibold">New Password</FormLabel>
               <FormControl>
-                <Input placeholder="******" type="password" {...field} />
+                <div className="relative group">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <Input
+                    placeholder="••••••••"
+                    type="password"
+                    className="pl-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
+                    {...field}
+                  />
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -226,24 +309,50 @@ function ResetForm({ email, onBack }: { email: string; onBack: () => void }) {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirm Password</FormLabel>
+              <FormLabel className="text-sm font-semibold">Confirm New Password</FormLabel>
               <FormControl>
-                <Input placeholder="******" type="password" {...field} />
+                <div className="relative group">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <Input
+                    placeholder="••••••••"
+                    type="password"
+                    className="pl-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
+                    {...field}
+                  />
+                </div>
               </FormControl>
               <FormMessage />
+              <p className="text-xs text-muted-foreground mt-1.5">
+                Must be at least 6 characters long
+              </p>
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={isPending}>
-          {isPending ? "Resetting..." : "Reset Password"}
+        <Button
+          type="submit"
+          className="w-full h-11 bg-linear-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover:scale-[1.02] font-semibold group"
+          disabled={isPending}
+        >
+          {isPending ? (
+            <>
+              <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+              Resetting Password...
+            </>
+          ) : (
+            <>
+              Reset Password
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </>
+          )}
         </Button>
         <Button
           type="button"
           variant="ghost"
-          className="w-full"
+          className="w-full h-11 hover:bg-muted/50 transition-colors group"
           onClick={onBack}
           disabled={isPending}
         >
+          <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
           Back to Email
         </Button>
       </form>
