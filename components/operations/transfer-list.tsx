@@ -107,6 +107,21 @@ export function TransferList({
     }
   };
 
+  const getLinkPath = (type: string) => {
+    switch (type) {
+      case "INCOMING":
+        return "receipts";
+      case "OUTGOING":
+        return "deliveries";
+      case "INTERNAL":
+        return "internal";
+      case "ADJUSTMENT":
+        return "adjustments";
+      default:
+        return "receipts";
+    }
+  };
+
   return (
     <>
       <div className="rounded-md border">
@@ -138,7 +153,9 @@ export function TransferList({
                 <TableRow key={transfer.id}>
                   <TableCell className="font-medium">
                     <Link
-                      href={`/dashboard/operations/receipts/${transfer.id}`}
+                      href={`/dashboard/operations/${getLinkPath(
+                        transfer.type
+                      )}/${transfer.id}`}
                       className="hover:underline text-primary"
                     >
                       {transfer.reference}

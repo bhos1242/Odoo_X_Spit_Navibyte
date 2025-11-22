@@ -84,24 +84,15 @@ function DotsLoader({ size }: { size: string }) {
   return (
     <div className="flex items-center gap-2">
       <div
-        className={cn(
-          dotSize,
-          "rounded-full bg-primary animate-bounce"
-        )}
+        className={cn(dotSize, "rounded-full bg-primary animate-bounce")}
         style={{ animationDelay: "0s" }}
       />
       <div
-        className={cn(
-          dotSize,
-          "rounded-full bg-purple-500 animate-bounce"
-        )}
+        className={cn(dotSize, "rounded-full bg-purple-500 animate-bounce")}
         style={{ animationDelay: "0.15s" }}
       />
       <div
-        className={cn(
-          dotSize,
-          "rounded-full bg-pink-500 animate-bounce"
-        )}
+        className={cn(dotSize, "rounded-full bg-pink-500 animate-bounce")}
         style={{ animationDelay: "0.3s" }}
       />
     </div>
@@ -113,10 +104,7 @@ function PulseLoader({ size }: { size: string }) {
   return (
     <div className="relative">
       <div
-        className={cn(
-          size,
-          "rounded-full bg-primary animate-ping opacity-75"
-        )}
+        className={cn(size, "rounded-full bg-primary animate-ping opacity-75")}
       />
       <div
         className={cn(
@@ -177,7 +165,7 @@ function LogoLoader({ size }: { size: string }) {
           "absolute inset-0 rounded-full border-4 border-transparent border-t-primary border-r-primary animate-spin"
         )}
       />
-      
+
       {/* Middle rotating ring */}
       <div
         className={cn(
@@ -196,10 +184,7 @@ function LogoLoader({ size }: { size: string }) {
 
       {/* Logo in center */}
       <div
-        className={cn(
-          size,
-          "flex items-center justify-center relative z-10"
-        )}
+        className={cn(size, "flex items-center justify-center relative z-10")}
       >
         <div className="flex items-center justify-center rounded-xl bg-linear-to-br from-primary to-purple-600 p-2 shadow-lg">
           <Box className="h-6 w-6 text-white animate-pulse" />
@@ -229,9 +214,18 @@ export function PageLoader({ text = "Loading..." }: { text?: string }) {
       <div className="mt-8 space-y-2 text-center">
         <p className="text-lg font-semibold">{text}</p>
         <div className="flex items-center justify-center gap-1">
-          <div className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0s" }} />
-          <div className="h-1.5 w-1.5 rounded-full bg-purple-500 animate-bounce" style={{ animationDelay: "0.15s" }} />
-          <div className="h-1.5 w-1.5 rounded-full bg-pink-500 animate-bounce" style={{ animationDelay: "0.3s" }} />
+          <div
+            className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce"
+            style={{ animationDelay: "0s" }}
+          />
+          <div
+            className="h-1.5 w-1.5 rounded-full bg-purple-500 animate-bounce"
+            style={{ animationDelay: "0.15s" }}
+          />
+          <div
+            className="h-1.5 w-1.5 rounded-full bg-pink-500 animate-bounce"
+            style={{ animationDelay: "0.3s" }}
+          />
         </div>
       </div>
     </div>
@@ -240,9 +234,7 @@ export function PageLoader({ text = "Loading..." }: { text?: string }) {
 
 // Skeleton Loader - For content loading
 export function SkeletonLoader({ className }: { className?: string }) {
-  return (
-    <div className={cn("animate-pulse rounded-md bg-muted", className)} />
-  );
+  return <div className={cn("animate-pulse rounded-md bg-muted", className)} />;
 }
 
 // Card Skeleton - For card loading states

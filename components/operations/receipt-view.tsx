@@ -223,7 +223,7 @@ export function ReceiptView({ transfer }: ReceiptViewProps) {
               <div className="flex justify-between font-bold text-lg">
                 <span>Total Value:</span>
                 <span>
-                  $
+                  ₹
                   {transfer.stockMoves
                     .reduce(
                       (acc: number, move: any) =>
