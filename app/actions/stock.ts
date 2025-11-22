@@ -1,11 +1,19 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { getSession } from '@/lib/session'
 
 export async function getStockMoves(query?: string) {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
     try {
-        const whereClause = query ? {
-            OR: [
+        const whereClause: any = {
+            userId: session.userId as string,
+        }
+
+        if (query) {
+            whereClause.OR = [
                 {
                     transfer: {
                         reference: {
@@ -25,7 +33,7 @@ export async function getStockMoves(query?: string) {
                     }
                 }
             ]
-        } : {}
+        }
 
         const moves = await prisma.stockMove.findMany({
             where: whereClause,
@@ -61,9 +69,13 @@ export async function getStockMoves(query?: string) {
 }
 
 export async function getCurrentStock() {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
     try {
         const stockLevels = await prisma.stockLevel.findMany({
             where: {
+                userId: session.userId as string,
                 quantity: {
                     not: 0
                 }

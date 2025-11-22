@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { TransferType, TransferStatus } from '@prisma/client'
+import { getSession } from '@/lib/session'
 
 export type OperationStats = {
     toProcess: number
@@ -18,7 +19,7 @@ export type DashboardStats = {
     totalValue: number
 }
 
-async function getOperationStats(type: TransferType): Promise<OperationStats> {
+async function getOperationStats(type: TransferType, userId: string): Promise<OperationStats> {
     const now = new Date()
 
     const [toProcess, late, waiting] = await prisma.$transaction([
@@ -28,7 +29,8 @@ async function getOperationStats(type: TransferType): Promise<OperationStats> {
                 type,
                 status: {
                     in: [TransferStatus.DRAFT, TransferStatus.WAITING, TransferStatus.READY]
-                }
+                },
+                userId
             }
         }),
         // Late: Scheduled date is past, and not done/canceled
@@ -40,14 +42,16 @@ async function getOperationStats(type: TransferType): Promise<OperationStats> {
                 },
                 scheduledDate: {
                     lt: now
-                }
+                },
+                userId
             }
         }),
         // Waiting: Specifically waiting status
         prisma.stockTransfer.count({
             where: {
                 type,
-                status: TransferStatus.WAITING
+                status: TransferStatus.WAITING,
+                userId
             }
         })
     ])
@@ -56,11 +60,15 @@ async function getOperationStats(type: TransferType): Promise<OperationStats> {
 }
 
 export async function getDashboardStats() {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+    const userId = session.userId as string;
+
     try {
         const [receipts, deliveries, internal] = await Promise.all([
-            getOperationStats(TransferType.INCOMING),
-            getOperationStats(TransferType.OUTGOING),
-            getOperationStats(TransferType.INTERNAL)
+            getOperationStats(TransferType.INCOMING, userId),
+            getOperationStats(TransferType.OUTGOING, userId),
+            getOperationStats(TransferType.INTERNAL, userId)
         ])
 
         // Low Stock: Products where any stock level is <= product.minStock
@@ -69,10 +77,13 @@ export async function getDashboardStats() {
         // Optimization: Only fetch products that have minStock > 0
         const productsWithStock = await prisma.product.findMany({
             where: {
-                minStock: { gt: 0 }
+                minStock: { gt: 0 },
+                userId
             },
             include: {
-                stockLevels: true
+                stockLevels: {
+                    where: { userId }
+                }
             }
         })
 
@@ -84,8 +95,11 @@ export async function getDashboardStats() {
         // Let's do a separate aggregation for total value if possible, or just fetch all.
         // Let's just fetch all products for now to be safe and simple.
         const allProducts = await prisma.product.findMany({
+            where: { userId },
             include: {
-                stockLevels: true
+                stockLevels: {
+                    where: { userId }
+                }
             }
         })
 
