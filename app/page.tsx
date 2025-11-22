@@ -32,19 +32,30 @@ export default function Home() {
             <span>IMS</span>
           </div>
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-            <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
+            <Link
+              href="#features"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
               Features
             </Link>
-            <Link href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">
+            <Link
+              href="#pricing"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
               Pricing
             </Link>
-            <Link href="#about" className="text-muted-foreground hover:text-foreground transition-colors">
+            <Link
+              href="#about"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
               About
             </Link>
           </nav>
           <div className="flex items-center gap-4">
             <Link href="/sign-in">
-              <Button variant="ghost" size="sm">Sign In</Button>
+              <Button variant="ghost" size="sm">
+                Sign In
+              </Button>
             </Link>
             <Link href="/dashboard">
               <Button size="sm">Get Started</Button>
@@ -58,85 +69,102 @@ export default function Home() {
         <section className="relative overflow-hidden py-20 md:py-32 lg:py-40">
           <div className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-size-[14px_24px]"></div>
           <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-primary/20 opacity-20 blur-[100px]"></div>
-          
+
           <div className="container px-4 md:px-6 flex flex-col items-center text-center gap-8">
             <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
               <span className="flex h-2 w-2 rounded-full bg-primary mr-2"></span>
               v2.0 is now live
             </div>
-            
+
             <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground max-w-4xl">
               Inventory Management <br className="hidden sm:inline" />
               <span className="text-primary">Reimagined</span> for Growth
             </h1>
-            
+
             <p className="max-w-2xl text-lg text-muted-foreground sm:text-xl leading-relaxed">
-              Streamline your operations with our comprehensive inventory solution. 
-              Manage products, warehouses, and stock moves with ease and precision.
+              Streamline your operations with our comprehensive inventory
+              solution. Manage products, warehouses, and stock moves with ease
+              and precision.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
               <Link href="/dashboard">
-                <Button size="lg" className="w-full sm:w-auto gap-2 h-12 px-8 text-base">
+                <Button
+                  size="lg"
+                  className="w-full sm:w-auto gap-2 h-12 px-8 text-base"
+                >
                   Get Started Now <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
               <Link href="#features">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto h-12 px-8 text-base">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full sm:w-auto h-12 px-8 text-base"
+                >
                   View Features
                 </Button>
               </Link>
             </div>
 
             <div className="mt-12 flex items-center justify-center gap-8 text-muted-foreground grayscale opacity-50">
-               <div className="flex items-center gap-2"><Globe className="h-5 w-5" /> Global Support</div>
-               <div className="flex items-center gap-2"><ShieldCheck className="h-5 w-5" /> Enterprise Security</div>
-               <div className="flex items-center gap-2"><Users className="h-5 w-5" /> Multi-User</div>
+              <div className="flex items-center gap-2">
+                <Globe className="h-5 w-5" /> Global Support
+              </div>
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5" /> Enterprise Security
+              </div>
+              <div className="flex items-center gap-2">
+                <Users className="h-5 w-5" /> Multi-User
+              </div>
             </div>
           </div>
         </section>
 
         {/* Features Section */}
-        <section id="features" className="container px-4 md:px-6 py-16 md:py-24 lg:py-32 space-y-12">
+        <section
+          id="features"
+          className="container px-4 md:px-6 py-16 md:py-24 lg:py-32 space-y-12"
+        >
           <div className="text-center space-y-4 max-w-3xl mx-auto">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
               Everything you need to scale
             </h2>
             <p className="text-lg text-muted-foreground">
-              Powerful features designed to help you maintain control over your inventory 
-              as your business grows.
+              Powerful features designed to help you maintain control over your
+              inventory as your business grows.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <FeatureCard 
-              icon={Warehouse} 
-              title="Multi-Warehouse" 
+            <FeatureCard
+              icon={Warehouse}
+              title="Multi-Warehouse"
               description="Manage multiple warehouses and locations with hierarchical structures for precise tracking."
             />
-            <FeatureCard 
-              icon={Box} 
-              title="Product Management" 
+            <FeatureCard
+              icon={Box}
+              title="Product Management"
               description="Track storable, consumable, and service products with detailed attributes and variants."
             />
-            <FeatureCard 
-              icon={Truck} 
-              title="Stock Operations" 
+            <FeatureCard
+              icon={Truck}
+              title="Stock Operations"
               description="Handle receipts, deliveries, and internal transfers seamlessly with automated workflows."
             />
-            <FeatureCard 
-              icon={LayoutDashboard} 
-              title="Real-time Dashboard" 
+            <FeatureCard
+              icon={LayoutDashboard}
+              title="Real-time Dashboard"
               description="Get instant insights into your stock levels, recent movements, and critical alerts."
             />
-            <FeatureCard 
-              icon={ShieldCheck} 
-              title="Secure Access" 
+            <FeatureCard
+              icon={ShieldCheck}
+              title="Secure Access"
               description="Role-based access control to ensure data security and integrity across your organization."
             />
-            <FeatureCard 
-              icon={BarChart3} 
-              title="Advanced Reporting" 
+            <FeatureCard
+              icon={BarChart3}
+              title="Advanced Reporting"
               description="Generate detailed reports on stock moves, valuation, and turnover to make informed decisions."
             />
           </div>
@@ -150,8 +178,8 @@ export default function Home() {
                 Ready to optimize your inventory?
               </h2>
               <p className="text-lg text-muted-foreground">
-                Join thousands of businesses that trust IMS to manage their stock efficiently.
-                Start your free trial today.
+                Join thousands of businesses that trust IMS to manage their
+                stock efficiently. Start your free trial today.
               </p>
               <Link href="/dashboard">
                 <Button size="lg" className="h-12 px-8 text-base">
@@ -179,38 +207,94 @@ export default function Home() {
               </p>
             </div>
             <div className="space-y-4">
-              <h3 className="font-semibold text-sm tracking-wider uppercase">Product</h3>
+              <h3 className="font-semibold text-sm tracking-wider uppercase">
+                Product
+              </h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="#" className="hover:text-foreground">Features</Link></li>
-                <li><Link href="#" className="hover:text-foreground">Pricing</Link></li>
-                <li><Link href="#" className="hover:text-foreground">Integrations</Link></li>
-                <li><Link href="#" className="hover:text-foreground">Changelog</Link></li>
+                <li>
+                  <Link href="#" className="hover:text-foreground">
+                    Features
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-foreground">
+                    Pricing
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-foreground">
+                    Integrations
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-foreground">
+                    Changelog
+                  </Link>
+                </li>
               </ul>
             </div>
             <div className="space-y-4">
-              <h3 className="font-semibold text-sm tracking-wider uppercase">Company</h3>
+              <h3 className="font-semibold text-sm tracking-wider uppercase">
+                Company
+              </h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="#" className="hover:text-foreground">About</Link></li>
-                <li><Link href="#" className="hover:text-foreground">Blog</Link></li>
-                <li><Link href="#" className="hover:text-foreground">Careers</Link></li>
-                <li><Link href="#" className="hover:text-foreground">Contact</Link></li>
+                <li>
+                  <Link href="#" className="hover:text-foreground">
+                    About
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-foreground">
+                    Blog
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-foreground">
+                    Careers
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-foreground">
+                    Contact
+                  </Link>
+                </li>
               </ul>
             </div>
             <div className="space-y-4">
-              <h3 className="font-semibold text-sm tracking-wider uppercase">Legal</h3>
+              <h3 className="font-semibold text-sm tracking-wider uppercase">
+                Legal
+              </h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="#" className="hover:text-foreground">Privacy</Link></li>
-                <li><Link href="#" className="hover:text-foreground">Terms</Link></li>
-                <li><Link href="#" className="hover:text-foreground">Security</Link></li>
+                <li>
+                  <Link href="#" className="hover:text-foreground">
+                    Privacy
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-foreground">
+                    Terms
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-foreground">
+                    Security
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-t pt-8 text-sm text-muted-foreground">
             <p>© 2025 IMS Inc. All rights reserved.</p>
             <div className="flex gap-4">
-              <Link href="#" className="hover:text-foreground">Twitter</Link>
-              <Link href="#" className="hover:text-foreground">GitHub</Link>
-              <Link href="#" className="hover:text-foreground">LinkedIn</Link>
+              <Link href="#" className="hover:text-foreground">
+                Twitter
+              </Link>
+              <Link href="#" className="hover:text-foreground">
+                GitHub
+              </Link>
+              <Link href="#" className="hover:text-foreground">
+                LinkedIn
+              </Link>
             </div>
           </div>
         </div>
@@ -219,7 +303,15 @@ export default function Home() {
   );
 }
 
-function FeatureCard({ icon: Icon, title, description }: { icon: any, title: string, description: string }) {
+function FeatureCard({
+  icon: Icon,
+  title,
+  description,
+}: {
+  icon: any;
+  title: string;
+  description: string;
+}) {
   return (
     <Card className="group relative overflow-hidden border-muted bg-background transition-all hover:shadow-lg hover:-translate-y-1">
       <CardHeader>
