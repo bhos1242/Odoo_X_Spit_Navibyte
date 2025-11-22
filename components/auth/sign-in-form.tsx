@@ -21,7 +21,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { toast } from "sonner";
+import toast from "react-hot-toast";
 import { signIn } from "@/app/actions/auth";
 import { useTransition } from "react";
 import Link from "next/link";
