@@ -2,10 +2,8 @@
 
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
-
-const prisma = new PrismaClient()
 
 const signUpSchema = z.object({
     name: z.string().min(2, 'Name must be at least 2 characters'),
