@@ -9,8 +9,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { useQuery } from "@tanstack/react-query";
-import { getContacts } from "@/app/actions/contact";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getContacts, deleteContact } from "@/app/actions/contact";
+import { toast } from "sonner";
 
 interface Contact {
   id: string;
@@ -26,6 +29,8 @@ interface ContactListProps {
 }
 
 export function ContactList({ initialContacts }: ContactListProps) {
+  const queryClient = useQueryClient();
+
   const { data: contacts = [] } = useQuery({
     queryKey: ["contacts"],
     queryFn: async () => {
@@ -34,6 +39,21 @@ export function ContactList({ initialContacts }: ContactListProps) {
       return (res.data || []) as Contact[];
     },
     initialData: initialContacts,
+  });
+
+  const { mutate: deleteContactFn, isPending: isDeleting } = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await deleteContact(id);
+      if (!res.success) throw new Error(res.error as string);
+      return res;
+    },
+    onSuccess: () => {
+      toast.success("Contact deleted");
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
 
   return (
@@ -46,13 +66,14 @@ export function ContactList({ initialContacts }: ContactListProps) {
             <TableHead>Email</TableHead>
             <TableHead>Phone</TableHead>
             <TableHead>Address</TableHead>
+            <TableHead className="w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {contacts.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={5}
+                colSpan={6}
                 className="text-center text-muted-foreground"
               >
                 No contacts found.
@@ -74,6 +95,20 @@ export function ContactList({ initialContacts }: ContactListProps) {
                 <TableCell>{contact.email || "-"}</TableCell>
                 <TableCell>{contact.phone || "-"}</TableCell>
                 <TableCell>{contact.address || "-"}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      if (confirm("Are you sure you want to delete this contact?")) {
+                        deleteContactFn(contact.id);
+                      }
+                    }}
+                    disabled={isDeleting}
+                  >
+                    <Trash2 className="h-4 w-4 text-red-500" />
+                  </Button>
+                </TableCell>
               </TableRow>
             ))
           )}
