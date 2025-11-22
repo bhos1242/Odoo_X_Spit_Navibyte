@@ -2,14 +2,42 @@
 
 import { prisma } from '@/lib/prisma'
 
-export async function getStockMoves() {
+export async function getStockMoves(query?: string) {
     try {
+        const whereClause = query ? {
+            OR: [
+                {
+                    transfer: {
+                        reference: {
+                            contains: query,
+                            mode: 'insensitive' as const
+                        }
+                    }
+                },
+                {
+                    transfer: {
+                        contact: {
+                            name: {
+                                contains: query,
+                                mode: 'insensitive' as const
+                            }
+                        }
+                    }
+                }
+            ]
+        } : {}
+
         const moves = await prisma.stockMove.findMany({
+            where: whereClause,
             include: {
                 product: true,
                 sourceLocation: true,
                 destinationLocation: true,
-                transfer: true,
+                transfer: {
+                    include: {
+                        contact: true
+                    }
+                },
             },
             orderBy: {
                 createdAt: 'desc',
