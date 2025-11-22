@@ -26,7 +26,7 @@ export default function Home() {
             <span>IMS</span>
           </div>
           <nav className="flex items-center gap-4">
-            <Link href="/login">
+            <Link href="/sign-in">
               <Button variant="ghost">Sign In</Button>
             </Link>
             <Link href="/dashboard">
