@@ -81,6 +81,7 @@ export function ProductDialog({
       unitOfMeasure: "Units",
       costPrice: 0,
       salesPrice: 0,
+      categoryId: "none",
       minStock: 0,
     },
   });
