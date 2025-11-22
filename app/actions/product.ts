@@ -4,52 +4,6 @@ import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
-// --- Categories ---
-
-const categorySchema = z.object({
-    name: z.string().min(2, "Name is required"),
-    description: z.string().optional(),
-    parentId: z.string().optional().nullable(),
-})
-
-export async function getCategories() {
-    try {
-        const categories = await prisma.category.findMany({
-            include: {
-                parent: true,
-                _count: {
-                    select: { products: true }
-                }
-            },
-            orderBy: {
-                name: 'asc',
-            },
-        })
-        return { success: true, data: categories }
-    } catch (error) {
-        return { success: false, error: 'Failed to fetch categories' }
-    }
-}
-
-export async function createCategory(data: z.infer<typeof categorySchema>) {
-    if (data.parentId === 'none' || data.parentId === '') data.parentId = null;
-
-    const validated = categorySchema.safeParse(data)
-    if (!validated.success) {
-        return { success: false, error: validated.error.flatten().fieldErrors }
-    }
-
-    try {
-        await prisma.category.create({
-            data: validated.data,
-        })
-        revalidatePath('/dashboard/inventory')
-        return { success: true }
-    } catch (error) {
-        return { success: false, error: 'Failed to create category' }
-    }
-}
-
 // --- Products ---
 
 const productSchema = z.object({

@@ -120,7 +120,9 @@ export function CategoryDialog({
       toast.success(categoryToEdit ? "Category updated" : "Category created");
     } else {
       toast.error(
-        categoryToEdit ? "Failed to update category" : "Failed to create category"
+        categoryToEdit
+          ? "Failed to update category"
+          : "Failed to create category"
       );
       console.error(result.error);
     }
@@ -199,7 +201,10 @@ export function CategoryDialog({
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Category description..." {...field} />
+                    <Textarea
+                      placeholder="Category description..."
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

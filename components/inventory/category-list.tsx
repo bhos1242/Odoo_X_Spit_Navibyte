@@ -47,7 +47,7 @@ export function CategoryList({ initialCategories }: CategoryListProps) {
         // For now, we rely on the parent page to refresh or we can update local state if we want
         // But since we used revalidatePath in the action, a router.refresh() in the parent or here would be better.
         // However, since this is a client component receiving props, we might need to refresh the page.
-        window.location.reload(); 
+        window.location.reload();
       } else {
         toast.error("Failed to delete category");
       }

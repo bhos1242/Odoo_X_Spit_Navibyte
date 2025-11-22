@@ -34,8 +34,8 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   createProduct,
   updateProduct,
-  getCategories,
 } from "@/app/actions/product";
+import { getCategories } from "@/app/actions/category";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
