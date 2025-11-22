@@ -263,7 +263,12 @@ export function ProductDialog({
                   <FormItem>
                     <FormLabel>Sales Price</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.01" {...field} value={field.value as number} />
+                      <Input
+                        type="number"
+                        step="0.01"
+                        {...field}
+                        value={field.value as number}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -276,7 +281,12 @@ export function ProductDialog({
                   <FormItem>
                     <FormLabel>Cost Price</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.01" {...field} value={field.value as number} />
+                      <Input
+                        type="number"
+                        step="0.01"
+                        {...field}
+                        value={field.value as number}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
