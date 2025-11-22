@@ -20,6 +20,9 @@ export async function signUp(prevState: any, formData: FormData) {
         role: formData.get('role'),
     })
 
+    console.log(`🚀 ~ auth.ts:23 ~ validatedFields:`, validatedFields)
+
+
     if (!validatedFields.success) {
         return {
             errors: validatedFields.error.flatten().fieldErrors,
