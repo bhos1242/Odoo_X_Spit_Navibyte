@@ -53,27 +53,46 @@ type ResetValues = z.infer<typeof resetSchema>;
 export function ForgotPasswordForm() {
   const [step, setStep] = useState<"EMAIL" | "OTP">("EMAIL");
   const [email, setEmail] = useState("");
-  const [isPending, startTransition] = useTransition();
-  const router = useRouter();
 
+  return (
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle>
+          {step === "EMAIL" ? "Forgot Password" : "Reset Password"}
+        </CardTitle>
+        <CardDescription>
+          {step === "EMAIL"
+            ? "Enter your email to receive a password reset OTP."
+            : `Enter the OTP sent to ${email} and your new password.`}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {step === "EMAIL" ? (
+          <EmailForm
+            onSuccess={(email) => {
+              setEmail(email);
+              setStep("OTP");
+            }}
+          />
+        ) : (
+          <ResetForm email={email} onBack={() => setStep("EMAIL")} />
+        )}
+      </CardContent>
+      <CardFooter className="flex justify-center">
+        <Link href="/sign-in" className="text-sm text-primary hover:underline">
+          Back to Sign In
+        </Link>
+      </CardFooter>
+    </Card>
+  );
+}
+
+function EmailForm({ onSuccess }: { onSuccess: (email: string) => void }) {
+  const [isPending, startTransition] = useTransition();
   const emailForm = useForm<EmailValues>({
     resolver: zodResolver(emailSchema),
     defaultValues: {
       email: "",
-    },
-  });
-
-  console.log(
-    `🚀 ~ forgot-password-form.tsx:61 ~ emailForm:`,
-    emailForm.formState.errors
-  );
-
-  const resetForm = useForm<ResetValues>({
-    resolver: zodResolver(resetSchema),
-    defaultValues: {
-      otp: "",
-      password: "",
-      confirmPassword: "",
     },
   });
 
@@ -91,14 +110,52 @@ export function ForgotPasswordForm() {
       } else if (result?.message) {
         if (result.success) {
           toast.success(result.message);
-          setEmail(values.email);
-          setStep("OTP");
+          onSuccess(values.email);
         } else {
           toast.error(result.message);
         }
       }
     });
   }
+
+  return (
+    <Form {...emailForm}>
+      <form
+        onSubmit={emailForm.handleSubmit(onEmailSubmit)}
+        className="space-y-4"
+      >
+        <FormField
+          control={emailForm.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input placeholder="john@example.com" type="email" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" className="w-full" disabled={isPending}>
+          {isPending ? "Sending OTP..." : "Send OTP"}
+        </Button>
+      </form>
+    </Form>
+  );
+}
+
+function ResetForm({ email, onBack }: { email: string; onBack: () => void }) {
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+  const resetForm = useForm<ResetValues>({
+    resolver: zodResolver(resetSchema),
+    defaultValues: {
+      otp: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
 
   function onResetSubmit(values: ResetValues) {
     startTransition(async () => {
@@ -126,119 +183,70 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle>
-          {step === "EMAIL" ? "Forgot Password" : "Reset Password"}
-        </CardTitle>
-        <CardDescription>
-          {step === "EMAIL"
-            ? "Enter your email to receive a password reset OTP."
-            : `Enter the OTP sent to ${email} and your new password.`}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {step === "EMAIL" ? (
-          <Form {...emailForm}>
-            <form
-              onSubmit={emailForm.handleSubmit(onEmailSubmit)}
-              className="space-y-4"
-            >
-              <FormField
-                control={emailForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="john@example.com"
-                        type="email"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={isPending}>
-                {isPending ? "Sending OTP..." : "Send OTP"}
-              </Button>
-            </form>
-          </Form>
-        ) : (
-          <Form {...resetForm}>
-            <form
-              onSubmit={resetForm.handleSubmit(onResetSubmit)}
-              className="space-y-4"
-            >
-              <FormField
-                control={resetForm.control}
-                name="otp"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>OTP</FormLabel>
-                    <FormControl>
-                      <InputOTP maxLength={4} {...field}>
-                        <InputOTPGroup>
-                          <InputOTPSlot index={0} />
-                          <InputOTPSlot index={1} />
-                          <InputOTPSlot index={2} />
-                          <InputOTPSlot index={3} />
-                        </InputOTPGroup>
-                      </InputOTP>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={resetForm.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>New Password</FormLabel>
-                    <FormControl>
-                      <Input placeholder="******" type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={resetForm.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
-                    <FormControl>
-                      <Input placeholder="******" type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={isPending}>
-                {isPending ? "Resetting..." : "Reset Password"}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full"
-                onClick={() => setStep("EMAIL")}
-                disabled={isPending}
-              >
-                Back to Email
-              </Button>
-            </form>
-          </Form>
-        )}
-      </CardContent>
-      <CardFooter className="flex justify-center">
-        <Link href="/sign-in" className="text-sm text-primary hover:underline">
-          Back to Sign In
-        </Link>
-      </CardFooter>
-    </Card>
+    <Form {...resetForm}>
+      <form
+        onSubmit={resetForm.handleSubmit(onResetSubmit)}
+        className="space-y-4"
+      >
+        <FormField
+          control={resetForm.control}
+          name="otp"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>OTP</FormLabel>
+              <FormControl>
+                <InputOTP maxLength={4} {...field}>
+                  <InputOTPGroup>
+                    <InputOTPSlot index={0} />
+                    <InputOTPSlot index={1} />
+                    <InputOTPSlot index={2} />
+                    <InputOTPSlot index={3} />
+                  </InputOTPGroup>
+                </InputOTP>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={resetForm.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>New Password</FormLabel>
+              <FormControl>
+                <Input placeholder="******" type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={resetForm.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirm Password</FormLabel>
+              <FormControl>
+                <Input placeholder="******" type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" className="w-full" disabled={isPending}>
+          {isPending ? "Resetting..." : "Reset Password"}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          className="w-full"
+          onClick={onBack}
+          disabled={isPending}
+        >
+          Back to Email
+        </Button>
+      </form>
+    </Form>
   );
 }
