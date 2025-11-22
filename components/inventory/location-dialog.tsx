@@ -205,7 +205,7 @@ export function LocationDialog({
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select a type" />
                       </SelectTrigger>
                     </FormControl>
@@ -236,7 +236,7 @@ export function LocationDialog({
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select a warehouse" />
                       </SelectTrigger>
                     </FormControl>
