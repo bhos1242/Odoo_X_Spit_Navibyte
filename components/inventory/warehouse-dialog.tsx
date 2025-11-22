@@ -69,7 +69,11 @@ export function WarehouseDialog({
         toast.success("Warehouse created");
         queryClient.invalidateQueries({ queryKey: ["warehouses"] });
       } else {
-        toast.error("Failed to create warehouse");
+        toast.error(
+          typeof result.error === "string"
+            ? result.error
+            : "Failed to create warehouse"
+        );
         console.error(result.error);
       }
     },
@@ -89,7 +93,11 @@ export function WarehouseDialog({
         toast.success("Warehouse updated");
         queryClient.invalidateQueries({ queryKey: ["warehouses"] });
       } else {
-        toast.error("Failed to update warehouse");
+        toast.error(
+          typeof result.error === "string"
+            ? result.error
+            : "Failed to update warehouse"
+        );
         console.error(result.error);
       }
     },
