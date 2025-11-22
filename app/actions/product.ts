@@ -99,7 +99,7 @@ export async function updateProduct(id: string, data: z.infer<typeof productSche
 
     try {
         await prisma.product.update({
-            where: { 
+            where: {
                 id,
                 userId: session.userId as string,
             },
@@ -124,7 +124,7 @@ export async function deleteProduct(id: string) {
 
     try {
         await prisma.product.delete({
-            where: { 
+            where: {
                 id,
                 userId: session.userId as string,
             },

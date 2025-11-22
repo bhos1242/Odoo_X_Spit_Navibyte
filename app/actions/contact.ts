@@ -24,7 +24,7 @@ export async function getContacts(type?: 'CUSTOMER' | 'VENDOR') {
         if (type) {
             where.type = type
         }
-        
+
         const contacts = await prisma.contact.findMany({
             where,
             orderBy: { createdAt: 'desc' }
@@ -65,7 +65,7 @@ export async function deleteContact(id: string) {
 
     try {
         await prisma.contact.delete({
-            where: { 
+            where: {
                 id,
                 userId: session.userId as string,
             }
