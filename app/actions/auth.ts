@@ -45,7 +45,6 @@ export async function signUp(data: z.infer<typeof signUpSchema>) {
             }
         }
 
-        console.log("Hashing password...");
         const hashedPassword = await bcrypt.hash(password, 10)
 
         console.log("Creating user...");
