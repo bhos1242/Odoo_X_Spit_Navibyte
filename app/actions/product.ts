@@ -40,6 +40,7 @@ export async function getProducts() {
 
 export async function createProduct(data: z.infer<typeof productSchema>) {
     if (data.categoryId === 'none' || data.categoryId === '') data.categoryId = null;
+    if (data.barcode === '') data.barcode = undefined;
 
     const validated = productSchema.safeParse(data)
     if (!validated.success) {
@@ -65,6 +66,7 @@ export async function createProduct(data: z.infer<typeof productSchema>) {
 
 export async function updateProduct(id: string, data: z.infer<typeof productSchema>) {
     if (data.categoryId === 'none' || data.categoryId === '') data.categoryId = null;
+    if (data.barcode === '') data.barcode = undefined;
 
     const validated = productSchema.safeParse(data)
     if (!validated.success) {
