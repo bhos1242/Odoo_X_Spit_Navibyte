@@ -8,107 +8,107 @@ import { redirect } from 'next/navigation'
 const prisma = new PrismaClient()
 
 const signUpSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  role: z.enum(['MANAGER', 'STAFF', 'STOCK_MASTER']).optional(),
+    name: z.string().min(2, 'Name must be at least 2 characters'),
+    email: z.string().email('Invalid email address'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    role: z.enum(['MANAGER', 'STAFF', 'STOCK_MASTER']).optional(),
 })
 
 export async function signUp(prevState: any, formData: FormData) {
-  const validatedFields = signUpSchema.safeParse({
-    name: formData.get('name'),
-    email: formData.get('email'),
-    password: formData.get('password'),
-    role: formData.get('role'),
-  })
-
-  if (!validatedFields.success) {
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-    }
-  }
-
-  const { name, email, password, role } = validatedFields.data
-
-  try {
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
+    const validatedFields = signUpSchema.safeParse({
+        name: formData.get('name'),
+        email: formData.get('email'),
+        password: formData.get('password'),
+        role: formData.get('role'),
     })
 
-    if (existingUser) {
-      return {
-        message: 'User already exists with this email.',
-      }
+    if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+        }
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10)
+    const { name, email, password, role } = validatedFields.data
 
-    await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        role: role as any || 'STAFF',
-      },
-    })
+    try {
+        const existingUser = await prisma.user.findUnique({
+            where: { email },
+        })
 
-  } catch (error) {
-    return {
-      message: 'Database Error: Failed to create user.',
+        if (existingUser) {
+            return {
+                message: 'User already exists with this email.',
+            }
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10)
+
+        await prisma.user.create({
+            data: {
+                name,
+                email,
+                password: hashedPassword,
+                role: role as any || 'STAFF',
+            },
+        })
+
+    } catch (error) {
+        return {
+            message: 'Database Error: Failed to create user.',
+        }
     }
-  }
 
-  redirect('/sign-in')
+    redirect('/sign-in')
 }
 
 const signInSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(1, 'Password is required'),
+    email: z.string().email('Invalid email address'),
+    password: z.string().min(1, 'Password is required'),
 })
 
 export async function signIn(prevState: any, formData: FormData) {
-  // This is a placeholder for actual session management (e.g. NextAuth.js or custom JWT)
-  // For this exercise, we will verify credentials and redirect.
-  
-  const validatedFields = signInSchema.safeParse({
-    email: formData.get('email'),
-    password: formData.get('password'),
-  })
+    // This is a placeholder for actual session management (e.g. NextAuth.js or custom JWT)
+    // For this exercise, we will verify credentials and redirect.
 
-  if (!validatedFields.success) {
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-    }
-  }
-
-  const { email, password } = validatedFields.data
-
-  try {
-    const user = await prisma.user.findUnique({
-      where: { email },
+    const validatedFields = signInSchema.safeParse({
+        email: formData.get('email'),
+        password: formData.get('password'),
     })
 
-    if (!user) {
-      return {
-        message: 'Invalid credentials.',
-      }
+    if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+        }
     }
 
-    const passwordsMatch = await bcrypt.compare(password, user.password)
+    const { email, password } = validatedFields.data
 
-    if (!passwordsMatch) {
-      return {
-        message: 'Invalid credentials.',
-      }
+    try {
+        const user = await prisma.user.findUnique({
+            where: { email },
+        })
+
+        if (!user) {
+            return {
+                message: 'Invalid credentials.',
+            }
+        }
+
+        const passwordsMatch = await bcrypt.compare(password, user.password)
+
+        if (!passwordsMatch) {
+            return {
+                message: 'Invalid credentials.',
+            }
+        }
+
+        // TODO: Set session cookie here
+
+    } catch (error) {
+        return {
+            message: 'Something went wrong.',
+        }
     }
 
-    // TODO: Set session cookie here
-    
-  } catch (error) {
-    return {
-      message: 'Something went wrong.',
-    }
-  }
-
-  redirect('/dashboard')
+    redirect('/dashboard')
 }
