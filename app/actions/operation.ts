@@ -77,6 +77,10 @@ export async function createTransfer(data: z.infer<typeof transferSchema>) {
 
     const { type, contactId, sourceLocationId, destinationLocationId, items, scheduledDate } = validated.data
 
+    if (sourceLocationId && destinationLocationId && sourceLocationId === destinationLocationId) {
+        return { success: false, error: "Source and Destination locations cannot be the same." }
+    }
+
     try {
         const reference = await generateReference(type)
 
