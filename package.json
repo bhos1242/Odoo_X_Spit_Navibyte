@@ -1,6 +1,7 @@
 {
   "name": "odoo-spit",
   "version": "0.1.0",
+  "packageManager": "pnpm@10.12.4",
   "private": true,
   "scripts": {
     "dev": "next dev --port 8000",
