@@ -100,7 +100,9 @@ export function ContactList({ initialContacts }: ContactListProps) {
                     variant="ghost"
                     size="icon"
                     onClick={() => {
-                      if (confirm("Are you sure you want to delete this contact?")) {
+                      if (
+                        confirm("Are you sure you want to delete this contact?")
+                      ) {
                         deleteContactFn(contact.id);
                       }
                     }}
