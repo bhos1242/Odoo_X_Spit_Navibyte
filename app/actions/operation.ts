@@ -258,3 +258,45 @@ export async function deleteTransfer(id: string) {
         return { success: false, error: 'Failed to delete transfer' }
     }
 }
+
+export async function getTransferById(id: string) {
+    const session = await getSession();
+    if (!session?.userId) return { success: false, error: "Unauthorized" };
+
+    try {
+        const transfer = await prisma.stockTransfer.findUnique({
+            where: {
+                id,
+                userId: session.userId as string
+            },
+            include: {
+                contact: true,
+                sourceLocation: true,
+                destinationLocation: true,
+                stockMoves: {
+                    include: {
+                        product: true
+                    }
+                }
+            }
+        })
+
+        if (!transfer) return { success: false, error: 'Transfer not found' }
+
+        const serializedTransfer = {
+            ...transfer,
+            stockMoves: transfer.stockMoves.map(move => ({
+                ...move,
+                product: {
+                    ...move.product,
+                    costPrice: Number(move.product.costPrice),
+                    salesPrice: Number(move.product.salesPrice)
+                }
+            }))
+        }
+
+        return { success: true, data: serializedTransfer }
+    } catch (error) {
+        return { success: false, error: 'Failed to fetch transfer' }
+    }
+}

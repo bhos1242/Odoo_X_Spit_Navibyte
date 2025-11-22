@@ -31,6 +31,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
 
+import Link from "next/link";
+
 interface Transfer {
   id: string;
   reference: string;
