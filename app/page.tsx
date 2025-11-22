@@ -58,7 +58,7 @@ export default function Home() {
         </section>
 
         <section className="container space-y-6 bg-slate-50 py-8 dark:bg-transparent md:py-12 lg:py-24 rounded-3xl">
-          <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
+          <div className="mx-auto flex max-w-4xl flex-col items-center space-y-4 text-center">
             <h2 className="font-heading text-3xl leading-[1.1] sm:text-3xl md:text-6xl font-bold">
               Features
             </h2>
@@ -66,7 +66,7 @@ export default function Home() {
               Everything you need to manage your inventory efficiently.
             </p>
           </div>
-          <div className="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3">
+          <div className="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-5xl md:grid-cols-3">
             <Card>
               <CardHeader>
                 <Warehouse className="h-10 w-10 mb-2 text-primary" />
