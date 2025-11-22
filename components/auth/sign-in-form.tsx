@@ -26,10 +26,10 @@ import { signIn } from "@/app/actions/auth";
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, Lock, ArrowRight, Sparkles, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, ArrowRight, Sparkles, Eye, EyeOff, User } from "lucide-react";
 
 const signInSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  identifier: z.string().min(1, "Email or Login ID is required"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -42,7 +42,7 @@ export function SignInForm() {
   const form = useForm<SignInValues>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
-      email: "",
+      identifier: "",
       password: "",
     },
   });
@@ -50,7 +50,7 @@ export function SignInForm() {
   function onSubmit(values: SignInValues) {
     startTransition(async () => {
       const formData = new FormData();
-      formData.append("email", values.email);
+      formData.append("identifier", values.identifier);
       formData.append("password", values.password);
 
       const result = await signIn(null, formData);
@@ -99,16 +99,16 @@ export function SignInForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             <FormField
               control={form.control}
-              name="email"
+              name="identifier"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-semibold">Email Address</FormLabel>
+                  <FormLabel className="text-sm font-semibold">Email or Login ID</FormLabel>
                   <FormControl>
                     <div className="relative group">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                       <Input
-                        placeholder="john@example.com"
-                        type="email"
+                        placeholder="john@example.com or username123"
+                        type="text"
                         className="pl-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
                         {...field}
                       />
