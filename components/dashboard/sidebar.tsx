@@ -1,32 +1,29 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { signOut } from "@/app/actions/auth";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
-  LayoutDashboard,
-  Package,
-  ArrowRightLeft,
-  Warehouse,
-  Users,
-  Settings,
-  LogOut,
-  History,
-  ClipboardList,
-  Truck,
-  Container,
-  MapPin,
-  Tags,
-  ShoppingCart,
   ArrowDownToLine,
+  ArrowRightLeft,
   ArrowUpFromLine,
   ChevronDown,
   ChevronRight,
+  ClipboardList,
+  History,
+  LayoutDashboard,
+  LogOut,
+  MapPin,
+  Package,
+  Settings,
+  Tags,
+  Users,
+  Warehouse,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { useState, useEffect } from "react";
-import { signOut } from "@/app/actions/auth";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const sidebarGroups = [
   {
@@ -104,23 +101,13 @@ const sidebarGroups = [
     items: [
       {
         title: "Users",
-        href: "/dashboard/users",
+        href: "/dashboard/contacts",
         icon: Users,
       },
       {
         title: "Settings",
         href: "/dashboard/settings",
         icon: Settings,
-      },
-    ],
-  },
-  {
-    title: "Contacts",
-    items: [
-      {
-        title: "Contacts",
-        href: "/dashboard/contacts",
-        icon: Users,
       },
     ],
   },
