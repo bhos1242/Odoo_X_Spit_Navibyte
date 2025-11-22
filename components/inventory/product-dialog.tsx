@@ -1,288 +1,310 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { Button } from '@/components/ui/button'
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog'
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
-import { createProduct, updateProduct, getCategories } from '@/app/actions/product'
-import { Plus } from 'lucide-react'
-import { toast } from 'sonner'
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  createProduct,
+  updateProduct,
+  getCategories,
+} from "@/app/actions/product";
+import { Plus } from "lucide-react";
+import { toast } from "sonner";
 
 const productSchema = z.object({
-    name: z.string().min(2, "Name is required"),
-    sku: z.string().min(2, "SKU is required"),
-    barcode: z.string().optional(),
-    description: z.string().optional(),
-    type: z.enum(['STORABLE', 'CONSUMABLE', 'SERVICE']),
-    unitOfMeasure: z.string().default("Units"),
-    costPrice: z.coerce.number().min(0),
-    salesPrice: z.coerce.number().min(0),
-    categoryId: z.string().optional(),
-    minStock: z.coerce.number().min(0).default(0),
-    maxStock: z.coerce.number().min(0).optional(),
-})
+  name: z.string().min(2, "Name is required"),
+  sku: z.string().min(2, "SKU is required"),
+  barcode: z.string().optional(),
+  description: z.string().optional(),
+  type: z.enum(["STORABLE", "CONSUMABLE", "SERVICE"]),
+  unitOfMeasure: z.string().default("Units"),
+  costPrice: z.coerce.number().min(0),
+  salesPrice: z.coerce.number().min(0),
+  categoryId: z.string().optional(),
+  minStock: z.coerce.number().min(0).default(0),
+  maxStock: z.coerce.number().min(0).optional(),
+});
 
 interface ProductDialogProps {
-    open?: boolean
-    onOpenChange?: (open: boolean) => void
-    productToEdit?: any
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  productToEdit?: any;
 }
 
-export function ProductDialog({ open: controlledOpen, onOpenChange: controlledOnOpenChange, productToEdit }: ProductDialogProps = {}) {
-    const [internalOpen, setInternalOpen] = useState(false)
-    const [categories, setCategories] = useState<any[]>([])
+export function ProductDialog({
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+  productToEdit,
+}: ProductDialogProps = {}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const [categories, setCategories] = useState<any[]>([]);
 
-    const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen
-    const setOpen = controlledOnOpenChange || setInternalOpen
+  const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = controlledOnOpenChange || setInternalOpen;
 
-    const form = useForm<z.infer<typeof productSchema>>({
-        resolver: zodResolver(productSchema),
-        defaultValues: {
-            name: '',
-            sku: '',
-            barcode: '',
-            description: '',
-            type: 'STORABLE',
-            unitOfMeasure: 'Units',
-            costPrice: 0,
-            salesPrice: 0,
-            minStock: 0,
-        },
-    })
+  const form = useForm<z.infer<typeof productSchema>>({
+    resolver: zodResolver(productSchema),
+    defaultValues: {
+      name: "",
+      sku: "",
+      barcode: "",
+      description: "",
+      type: "STORABLE",
+      unitOfMeasure: "Units",
+      costPrice: 0,
+      salesPrice: 0,
+      minStock: 0,
+    },
+  });
 
-    useEffect(() => {
-        if (isOpen) {
-            getCategories().then((res) => {
-                if (res.success) setCategories(res.data || [])
-            })
-        }
-    }, [isOpen])
+  useEffect(() => {
+    if (isOpen) {
+      getCategories().then((res) => {
+        if (res.success) setCategories(res.data || []);
+      });
+    }
+  }, [isOpen]);
 
-    useEffect(() => {
-        if (productToEdit) {
-            form.reset({
-                name: productToEdit.name,
-                sku: productToEdit.sku,
-                barcode: productToEdit.barcode || '',
-                description: productToEdit.description || '',
-                type: productToEdit.type,
-                unitOfMeasure: productToEdit.unitOfMeasure,
-                costPrice: Number(productToEdit.costPrice),
-                salesPrice: Number(productToEdit.salesPrice),
-                categoryId: productToEdit.categoryId || 'none',
-                minStock: productToEdit.minStock,
-                maxStock: productToEdit.maxStock,
-            })
-        } else {
-            form.reset({
-                name: '',
-                sku: '',
-                barcode: '',
-                description: '',
-                type: 'STORABLE',
-                unitOfMeasure: 'Units',
-                costPrice: 0,
-                salesPrice: 0,
-                categoryId: 'none',
-                minStock: 0,
-            })
-        }
-    }, [productToEdit, form, isOpen])
+  useEffect(() => {
+    if (productToEdit) {
+      form.reset({
+        name: productToEdit.name,
+        sku: productToEdit.sku,
+        barcode: productToEdit.barcode || "",
+        description: productToEdit.description || "",
+        type: productToEdit.type,
+        unitOfMeasure: productToEdit.unitOfMeasure,
+        costPrice: Number(productToEdit.costPrice),
+        salesPrice: Number(productToEdit.salesPrice),
+        categoryId: productToEdit.categoryId || "none",
+        minStock: productToEdit.minStock,
+        maxStock: productToEdit.maxStock,
+      });
+    } else {
+      form.reset({
+        name: "",
+        sku: "",
+        barcode: "",
+        description: "",
+        type: "STORABLE",
+        unitOfMeasure: "Units",
+        costPrice: 0,
+        salesPrice: 0,
+        categoryId: "none",
+        minStock: 0,
+      });
+    }
+  }, [productToEdit, form, isOpen]);
 
-    async function onSubmit(values: z.infer<typeof productSchema>) {
-        let result
-        if (productToEdit) {
-            result = await updateProduct(productToEdit.id, values)
-        } else {
-            result = await createProduct(values)
-        }
-
-        if (result.success) {
-            setOpen(false)
-            form.reset()
-            toast.success(productToEdit ? 'Product updated' : 'Product created')
-        } else {
-            toast.error(productToEdit ? 'Failed to update product' : 'Failed to create product')
-            console.error(result.error)
-        }
+  async function onSubmit(values: z.infer<typeof productSchema>) {
+    let result;
+    if (productToEdit) {
+      result = await updateProduct(productToEdit.id, values);
+    } else {
+      result = await createProduct(values);
     }
 
-    return (
-        <Dialog open={isOpen} onOpenChange={setOpen}>
-            {controlledOpen === undefined && (
-                <DialogTrigger asChild>
-                    <Button>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Product
-                    </Button>
-                </DialogTrigger>
-            )}
-            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                    <DialogTitle>{productToEdit ? 'Edit Product' : 'Create Product'}</DialogTitle>
-                    <DialogDescription>
-                        {productToEdit ? 'Update product details.' : 'Add a new product to your inventory.'}
-                    </DialogDescription>
-                </DialogHeader>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            <FormField
-                                control={form.control}
-                                name="name"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Name</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Product Name" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="sku"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>SKU</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="SKU-123" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
+    if (result.success) {
+      setOpen(false);
+      form.reset();
+      toast.success(productToEdit ? "Product updated" : "Product created");
+    } else {
+      toast.error(
+        productToEdit ? "Failed to update product" : "Failed to create product"
+      );
+      console.error(result.error);
+    }
+  }
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <FormField
-                                control={form.control}
-                                name="type"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Type</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select type" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="STORABLE">Storable Product</SelectItem>
-                                                <SelectItem value="CONSUMABLE">Consumable</SelectItem>
-                                                <SelectItem value="SERVICE">Service</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="categoryId"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Category</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select category" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="none">None</SelectItem>
-                                                {categories.map((cat) => (
-                                                    <SelectItem key={cat.id} value={cat.id}>
-                                                        {cat.name}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
+  return (
+    <Dialog open={isOpen} onOpenChange={setOpen}>
+      {controlledOpen === undefined && (
+        <DialogTrigger asChild>
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Product
+          </Button>
+        </DialogTrigger>
+      )}
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>
+            {productToEdit ? "Edit Product" : "Create Product"}
+          </DialogTitle>
+          <DialogDescription>
+            {productToEdit
+              ? "Update product details."
+              : "Add a new product to your inventory."}
+          </DialogDescription>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Product Name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="sku"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>SKU</FormLabel>
+                    <FormControl>
+                      <Input placeholder="SKU-123" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <FormField
-                                control={form.control}
-                                name="salesPrice"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Sales Price</FormLabel>
-                                        <FormControl>
-                                            <Input type="number" step="0.01" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="costPrice"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Cost Price</FormLabel>
-                                        <FormControl>
-                                            <Input type="number" step="0.01" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="STORABLE">
+                          Storable Product
+                        </SelectItem>
+                        <SelectItem value="CONSUMABLE">Consumable</SelectItem>
+                        <SelectItem value="SERVICE">Service</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="categoryId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        {categories.map((cat) => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            {cat.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-                        <FormField
-                            control={form.control}
-                            name="description"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Description</FormLabel>
-                                    <FormControl>
-                                        <Textarea placeholder="Product description..." {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="salesPrice"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Sales Price</FormLabel>
+                    <FormControl>
+                      <Input type="number" step="0.01" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="costPrice"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Cost Price</FormLabel>
+                    <FormControl>
+                      <Input type="number" step="0.01" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-                        <DialogFooter>
-                            <Button type="submit">
-                                {productToEdit ? 'Update Product' : 'Create Product'}
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </Form>
-            </DialogContent>
-        </Dialog>
-    )
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Product description..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <DialogFooter>
+              <Button type="submit">
+                {productToEdit ? "Update Product" : "Create Product"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
 }

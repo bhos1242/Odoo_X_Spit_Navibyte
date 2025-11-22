@@ -1,166 +1,189 @@
-'use client'
+"use client";
 
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { MoreVertical, Pencil, Trash2 } from 'lucide-react'
-import { useState } from 'react'
-import { ProductDialog } from './product-dialog'
-import { deleteProduct } from '@/app/actions/product'
-import { toast } from 'sonner'
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { ProductDialog } from "./product-dialog";
+import { deleteProduct } from "@/app/actions/product";
+import { toast } from "sonner";
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Product {
-    id: string
-    name: string
-    sku: string
-    type: string
-    salesPrice: number
-    costPrice: number
-    category?: {
-        name: string
-    }
-    stockLevels: any[]
+  id: string;
+  name: string;
+  sku: string;
+  type: string;
+  salesPrice: number;
+  costPrice: number;
+  category?: {
+    name: string;
+  };
+  stockLevels: any[];
 }
 
 interface ProductListProps {
-    products: Product[]
+  products: Product[];
 }
 
 export function ProductList({ products }: ProductListProps) {
-    const [editingProduct, setEditingProduct] = useState<Product | null>(null)
-    const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-    const handleDelete = async () => {
-        if (!deletingId) return
-        const result = await deleteProduct(deletingId)
-        if (result.success) {
-            toast.success('Product deleted successfully')
-        } else {
-            toast.error('Failed to delete product')
-        }
-        setDeletingId(null)
+  const handleDelete = async () => {
+    if (!deletingId) return;
+    const result = await deleteProduct(deletingId);
+    if (result.success) {
+      toast.success("Product deleted successfully");
+    } else {
+      toast.error("Failed to delete product");
     }
+    setDeletingId(null);
+  };
 
-    return (
-        <>
-            <div className="rounded-md border">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>SKU</TableHead>
-                            <TableHead>Category</TableHead>
-                            <TableHead>Type</TableHead>
-                            <TableHead className="text-right">Price</TableHead>
-                            <TableHead className="text-right">Cost</TableHead>
-                            <TableHead className="text-right">On Hand</TableHead>
-                            <TableHead className="w-[50px]"></TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {products.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={8} className="text-center text-muted-foreground">
-                                    No products found.
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            products.map((product) => {
-                                const totalStock = product.stockLevels.reduce((acc, curr) => acc + curr.quantity, 0)
-                                return (
-                                    <TableRow key={product.id}>
-                                        <TableCell className="font-medium">{product.name}</TableCell>
-                                        <TableCell>{product.sku}</TableCell>
-                                        <TableCell>{product.category?.name || '-'}</TableCell>
-                                        <TableCell>
-                                            <Badge variant="secondary">{product.type}</Badge>
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            ${Number(product.salesPrice).toFixed(2)}
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            ${Number(product.costPrice).toFixed(2)}
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <Badge variant={totalStock > 0 ? "outline" : "destructive"}>
-                                                {totalStock} Units
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                        <MoreVertical className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem onClick={() => setEditingProduct(product)}>
-                                                        <Pencil className="mr-2 h-4 w-4" />
-                                                        Edit
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        className="text-red-600"
-                                                        onClick={() => setDeletingId(product.id)}
-                                                    >
-                                                        <Trash2 className="mr-2 h-4 w-4" />
-                                                        Delete
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                )
-                            })
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
-
-            <ProductDialog
-                open={!!editingProduct}
-                onOpenChange={(open) => !open && setEditingProduct(null)}
-                productToEdit={editingProduct}
-            />
-
-            <AlertDialog open={!!deletingId} onOpenChange={(open) => !open && setDeletingId(null)}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the product.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+  return (
+    <>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>SKU</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead className="text-right">Price</TableHead>
+              <TableHead className="text-right">Cost</TableHead>
+              <TableHead className="text-right">On Hand</TableHead>
+              <TableHead className="w-[50px]"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {products.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={8}
+                  className="text-center text-muted-foreground"
+                >
+                  No products found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              products.map((product) => {
+                const totalStock = product.stockLevels.reduce(
+                  (acc, curr) => acc + curr.quantity,
+                  0
+                );
+                return (
+                  <TableRow key={product.id}>
+                    <TableCell className="font-medium">
+                      {product.name}
+                    </TableCell>
+                    <TableCell>{product.sku}</TableCell>
+                    <TableCell>{product.category?.name || "-"}</TableCell>
+                    <TableCell>
+                      <Badge variant="secondary">{product.type}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      ${Number(product.salesPrice).toFixed(2)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      ${Number(product.costPrice).toFixed(2)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Badge
+                        variant={totalStock > 0 ? "outline" : "destructive"}
+                      >
+                        {totalStock} Units
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => setEditingProduct(product)}
+                          >
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-red-600"
+                            onClick={() => setDeletingId(product.id)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
                             Delete
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-        </>
-    )
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <ProductDialog
+        open={!!editingProduct}
+        onOpenChange={(open) => !open && setEditingProduct(null)}
+        productToEdit={editingProduct}
+      />
+
+      <AlertDialog
+        open={!!deletingId}
+        onOpenChange={(open) => !open && setDeletingId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              product.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
 }
