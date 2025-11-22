@@ -1,0 +1,137 @@
+'use server'
+
+import { prisma } from '@/lib/prisma'
+import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
+import { Decimal } from '@prisma/client/runtime/library'
+
+// --- Categories ---
+
+const categorySchema = z.object({
+    name: z.string().min(2, "Name is required"),
+    description: z.string().optional(),
+    parentId: z.string().optional().nullable(),
+})
+
+export async function getCategories() {
+    try {
+        const categories = await prisma.category.findMany({
+            include: {
+                parent: true,
+                _count: {
+                    select: { products: true }
+                }
+            },
+            orderBy: {
+                name: 'asc',
+            },
+        })
+        return { success: true, data: categories }
+    } catch (error) {
+        return { success: false, error: 'Failed to fetch categories' }
+    }
+}
+
+export async function createCategory(data: z.infer<typeof categorySchema>) {
+    if (data.parentId === 'none' || data.parentId === '') data.parentId = null;
+
+    const validated = categorySchema.safeParse(data)
+    if (!validated.success) {
+        return { success: false, error: validated.error.flatten().fieldErrors }
+    }
+
+    try {
+        await prisma.category.create({
+            data: validated.data,
+        })
+        revalidatePath('/dashboard/inventory')
+        return { success: true }
+    } catch (error) {
+        return { success: false, error: 'Failed to create category' }
+    }
+}
+
+// --- Products ---
+
+const productSchema = z.object({
+    name: z.string().min(2, "Name is required"),
+    sku: z.string().min(2, "SKU is required"),
+    barcode: z.string().optional(),
+    description: z.string().optional(),
+    type: z.enum(['STORABLE', 'CONSUMABLE', 'SERVICE']),
+    unitOfMeasure: z.string().default("Units"),
+    costPrice: z.coerce.number().min(0),
+    salesPrice: z.coerce.number().min(0),
+    categoryId: z.string().optional().nullable(),
+    minStock: z.coerce.number().min(0).default(0),
+    maxStock: z.coerce.number().min(0).optional(),
+})
+
+export async function getProducts() {
+    try {
+        const products = await prisma.product.findMany({
+            include: {
+                category: true,
+                stockLevels: true, // To calculate total stock
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        })
+        return { success: true, data: products }
+    } catch (error) {
+        return { success: false, error: 'Failed to fetch products' }
+    }
+}
+
+export async function createProduct(data: z.infer<typeof productSchema>) {
+    if (data.categoryId === 'none' || data.categoryId === '') data.categoryId = null;
+
+    const validated = productSchema.safeParse(data)
+    if (!validated.success) {
+        return { success: false, error: validated.error.flatten().fieldErrors }
+    }
+
+    try {
+        await prisma.product.create({
+            data: validated.data,
+        })
+        revalidatePath('/dashboard/inventory')
+        return { success: true }
+    } catch (error) {
+        console.error(error)
+        return { success: false, error: 'Failed to create product' }
+    }
+}
+
+export async function updateProduct(id: string, data: z.infer<typeof productSchema>) {
+    if (data.categoryId === 'none' || data.categoryId === '') data.categoryId = null;
+
+    const validated = productSchema.safeParse(data)
+    if (!validated.success) {
+        return { success: false, error: validated.error.flatten().fieldErrors }
+    }
+
+    try {
+        await prisma.product.update({
+            where: { id },
+            data: validated.data,
+        })
+        revalidatePath('/dashboard/inventory')
+        return { success: true }
+    } catch (error) {
+        return { success: false, error: 'Failed to update product' }
+    }
+}
+
+export async function deleteProduct(id: string) {
+    try {
+        await prisma.product.delete({
+            where: { id },
+        })
+        revalidatePath('/dashboard/inventory')
+        return { success: true }
+    } catch (error) {
+        return { success: false, error: 'Failed to delete product' }
+    }
+}
