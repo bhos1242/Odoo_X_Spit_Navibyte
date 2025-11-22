@@ -24,7 +24,7 @@ import {
 import { toast } from "react-hot-toast";
 import { signUp } from "@/app/actions/auth";
 import Link from "next/link";
-import Image from "next/image";
+import { Box, Mail, Lock, User, ArrowRight, Sparkles, CheckCircle2 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
@@ -76,79 +76,151 @@ export function SignUpForm() {
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader className="space-y-1 flex flex-col items-center">
-        <div className="w-12 h-12 relative mb-2">
-          <Image
-            src="/logo.png"
-            alt="Logo"
-            fill
-            className="object-contain"
-            priority
-          />
+    <Card className="w-full max-w-md mx-auto relative overflow-hidden border border-border/50 bg-background/80 backdrop-blur-xl shadow-2xl">
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-purple-500/5 pointer-events-none"></div>
+      
+      {/* Shine Effect */}
+      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-linear-to-r from-transparent via-white/5 to-transparent pointer-events-none"></div>
+
+      <CardHeader className="space-y-3 flex flex-col items-center text-center relative z-10 pb-8">
+        {/* Logo */}
+        <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-primary to-purple-600 text-white shadow-xl shadow-primary/25 mb-2 group hover:scale-110 transition-transform duration-300">
+          <Box className="h-8 w-8 transition-transform duration-300 group-hover:rotate-12" />
+          <div className="absolute inset-0 rounded-2xl bg-linear-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
         </div>
-        <CardTitle>Sign Up</CardTitle>
-        <CardDescription>
-          Create an account to manage your inventory.
-        </CardDescription>
+
+        {/* Title with Badge */}
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-2">
+            <Sparkles className="h-3 w-3 text-primary animate-pulse" />
+            <span className="text-xs font-semibold text-primary">Get Started Free</span>
+          </div>
+          <CardTitle className="text-2xl md:text-3xl font-extrabold bg-linear-to-r from-foreground to-foreground/70 bg-clip-text">
+            Create Account
+          </CardTitle>
+          <CardDescription className="text-base">
+            Join us to manage your inventory efficiently
+          </CardDescription>
+        </div>
       </CardHeader>
-      <CardContent>
+
+      <CardContent className="relative z-10">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel className="text-sm font-semibold">Full Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="John Doe" {...field} />
+                    <div className="relative group">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <Input
+                        placeholder="John Doe"
+                        className="pl-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
+                        {...field}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="text-sm font-semibold">Email Address</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="john@example.com"
-                      type="email"
-                      {...field}
-                    />
+                    <div className="relative group">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <Input
+                        placeholder="john@example.com"
+                        type="email"
+                        className="pl-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
+                        {...field}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel className="text-sm font-semibold">Password</FormLabel>
                   <FormControl>
-                    <Input placeholder="******" type="password" {...field} />
+                    <div className="relative group">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                      <Input
+                        placeholder="••••••••"
+                        type="password"
+                        className="pl-10 h-11 border-border/50 focus:border-primary/50 bg-background/50 transition-all"
+                        {...field}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
+                  <p className="text-xs text-muted-foreground mt-1.5">
+                    Must be at least 6 characters long
+                  </p>
                 </FormItem>
               )}
             />
-            {/* Role selection could be added here if needed, defaulting to STAFF for now */}
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? "Creating account..." : "Sign Up"}
+
+            {/* Benefits List */}
+            <div className="bg-muted/30 rounded-lg p-4 space-y-2">
+              <p className="text-xs font-semibold text-muted-foreground mb-2">What you'll get:</p>
+              <div className="space-y-1.5">
+                {[
+                  "Real-time inventory tracking",
+                  "Advanced analytics dashboard",
+                  "Multi-warehouse support",
+                ].map((benefit, i) => (
+                  <div key={i} className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+                    <span>{benefit}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full h-11 bg-linear-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover:scale-[1.02] font-semibold group"
+              disabled={isPending}
+            >
+              {isPending ? (
+                <>
+                  <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                  Creating account...
+                </>
+              ) : (
+                <>
+                  Create Account
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </>
+              )}
             </Button>
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="flex justify-center">
+
+      <CardFooter className="flex justify-center relative z-10 pt-6 border-t border-border/50">
         <p className="text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/sign-in" className="text-primary hover:underline">
+          <Link
+            href="/sign-in"
+            className="font-semibold text-primary hover:underline transition-colors"
+          >
             Sign in
           </Link>
         </p>
