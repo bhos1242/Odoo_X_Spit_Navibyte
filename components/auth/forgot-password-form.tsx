@@ -169,7 +169,14 @@ export function ForgotPasswordForm() {
                   <FormItem>
                     <FormLabel>OTP</FormLabel>
                     <FormControl>
-                      <Input placeholder="123456" {...field} />
+                      <Input
+                        placeholder="123456"
+                        maxLength={6}
+                        type="text"
+                        autoComplete="one-time-code"
+                        autoFocus
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
