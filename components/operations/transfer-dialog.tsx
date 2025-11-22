@@ -43,12 +43,25 @@ const moveSchema = z.object({
   quantity: z.coerce.number().min(1, "Quantity must be at least 1"),
 });
 
-const transferSchema = z.object({
-  contactId: z.string().optional(),
-  sourceLocationId: z.string().optional(),
-  destinationLocationId: z.string().optional(),
-  items: z.array(moveSchema).min(1, "At least one item is required"),
-});
+const transferSchema = z
+  .object({
+    contactId: z.string().optional(),
+    sourceLocationId: z.string().optional(),
+    destinationLocationId: z.string().optional(),
+    items: z.array(moveSchema).min(1, "At least one item is required"),
+  })
+  .refine(
+    (data) => {
+      if (data.sourceLocationId && data.destinationLocationId) {
+        return data.sourceLocationId !== data.destinationLocationId;
+      }
+      return true;
+    },
+    {
+      message: "Source and Destination locations cannot be the same",
+      path: ["destinationLocationId"],
+    }
+  );
 
 interface TransferDialogProps {
   open?: boolean;
