@@ -18,8 +18,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { WarehouseDialog } from "./warehouse-dialog";
-import { deleteWarehouse } from "@/app/actions/warehouse";
-import { toast } from "sonner";
+import { deleteWarehouse, getWarehouses } from "@/app/actions/warehouse";
+import toast from "react-hot-toast";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,20 +40,41 @@ interface Warehouse {
   locations: any[];
 }
 
-export function WarehouseList({ warehouses }: { warehouses: Warehouse[] }) {
+export function WarehouseList({ warehouses: initialWarehouses }: { warehouses: Warehouse[] }) {
   const [editingWarehouse, setEditingWarehouse] = useState<Warehouse | null>(
     null
   );
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+
+  const { data: warehouses = [] } = useQuery({
+    queryKey: ["warehouses"],
+    queryFn: async () => {
+      const res = await getWarehouses();
+      if (!res.success) throw new Error(res.error as string);
+      return (res.data || []) as unknown as Warehouse[];
+    },
+    initialData: initialWarehouses,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteWarehouse,
+    onSuccess: (result) => {
+      if (result.success) {
+        toast.success("Warehouse deleted successfully");
+        queryClient.invalidateQueries({ queryKey: ["warehouses"] });
+      } else {
+        toast.error(result.error as string);
+      }
+    },
+    onError: () => {
+      toast.error("Failed to delete warehouse");
+    },
+  });
 
   const handleDelete = async () => {
     if (!deletingId) return;
-    const result = await deleteWarehouse(deletingId);
-    if (result.success) {
-      toast.success("Warehouse deleted successfully");
-    } else {
-      toast.error(result.error as string);
-    }
+    deleteMutation.mutate(deletingId);
     setDeletingId(null);
   };
 
