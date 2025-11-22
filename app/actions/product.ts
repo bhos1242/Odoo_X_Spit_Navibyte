@@ -31,7 +31,14 @@ export async function getProducts() {
                 createdAt: 'desc',
             },
         })
-        return { success: true, data: products }
+
+        const serializedProducts = products.map((product) => ({
+            ...product,
+            costPrice: product.costPrice.toNumber(),
+            salesPrice: product.salesPrice.toNumber(),
+        }))
+
+        return { success: true, data: serializedProducts }
     } catch (error) {
         return { success: false, error: 'Failed to fetch products' }
     }
