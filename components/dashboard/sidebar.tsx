@@ -22,6 +22,7 @@ import {
   ArrowUpFromLine,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 const sidebarGroups = [
   {
@@ -137,9 +138,17 @@ export function Sidebar({ className }: SidebarProps) {
     >
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
-          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
-            IMS
-          </h2>
+          <div className="mb-6 px-4 flex items-center gap-2">
+            <div className="relative h-8 w-8">
+              <Image
+                src="/logo.png"
+                alt="IMS Logo"
+                fill
+                className="object-contain"
+              />
+            </div>
+            <h2 className="text-lg font-semibold tracking-tight">IMS</h2>
+          </div>
           <div className="space-y-4">
             {sidebarGroups.map((group) => (
               <div key={group.title} className="px-3 py-2">

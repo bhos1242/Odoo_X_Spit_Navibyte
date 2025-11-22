@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -29,8 +30,14 @@ export default async function Home() {
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <Box className="h-5 w-5" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg">
+              <Image
+                src="/logo.png"
+                alt="IMS Logo"
+                width={32}
+                height={32}
+                className="h-8 w-8 object-contain"
+              />
             </div>
             <span>IMS</span>
           </div>
@@ -217,8 +224,14 @@ export default async function Home() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div className="col-span-2 md:col-span-1 space-y-4">
               <div className="flex items-center gap-2 font-bold text-xl">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <Box className="h-5 w-5" />
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg">
+                  <Image
+                    src="/logo.png"
+                    alt="IMS Logo"
+                    width={32}
+                    height={32}
+                    className="h-8 w-8 object-contain"
+                  />
                 </div>
                 <span>IMS</span>
               </div>

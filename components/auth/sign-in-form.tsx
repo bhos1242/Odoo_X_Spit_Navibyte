@@ -25,6 +25,7 @@ import toast from "react-hot-toast";
 import { signIn } from "@/app/actions/auth";
 import { useTransition } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const signInSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -64,7 +65,16 @@ export function SignInForm() {
 
   return (
     <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
+      <CardHeader className="space-y-1 flex flex-col items-center">
+        <div className="w-12 h-12 relative mb-2">
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            fill
+            className="object-contain"
+            priority
+          />
+        </div>
         <CardTitle>Sign In</CardTitle>
         <CardDescription>
           Welcome back! Please sign in to continue.
