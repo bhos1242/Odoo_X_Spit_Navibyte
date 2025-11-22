@@ -40,7 +40,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 const productSchema = z.object({
   name: z.string().min(2, "Name is required"),
   sku: z.string().min(2, "SKU is required"),
-  barcode: z.string().optional(),
   description: z.string().optional(),
   type: z.enum(["STORABLE", "CONSUMABLE", "SERVICE"]),
   unitOfMeasure: z.string().default("Units"),
@@ -129,7 +128,6 @@ export function ProductDialog({
     defaultValues: {
       name: "",
       sku: "",
-      barcode: "",
       description: "",
       type: "STORABLE" as const,
       unitOfMeasure: "Units",
@@ -145,7 +143,6 @@ export function ProductDialog({
       form.reset({
         name: productToEdit.name,
         sku: productToEdit.sku,
-        barcode: productToEdit.barcode || "",
         description: productToEdit.description || "",
         type: productToEdit.type,
         unitOfMeasure: productToEdit.unitOfMeasure,
@@ -159,7 +156,6 @@ export function ProductDialog({
       form.reset({
         name: "",
         sku: "",
-        barcode: "",
         description: "",
         type: "STORABLE",
         unitOfMeasure: "Units",
@@ -230,20 +226,6 @@ export function ProductDialog({
                 )}
               />
             </div>
-
-            <FormField
-              control={form.control}
-              name="barcode"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Barcode</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Scan barcode..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             <div className="grid grid-cols-2 gap-4">
               <FormField
