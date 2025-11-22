@@ -21,7 +21,9 @@ export function WarehouseList({ warehouses }: { warehouses: Warehouse[] }) {
   if (warehouses.length === 0) {
     return (
       <div className="text-center p-8 border rounded-lg bg-muted/10">
-        <p className="text-muted-foreground">No warehouses found. Create one to get started.</p>
+        <p className="text-muted-foreground">
+          No warehouses found. Create one to get started.
+        </p>
       </div>
     );
   }
