@@ -21,6 +21,7 @@ interface StockLevel {
   location: {
     name: string;
     shortCode: string;
+    type: string;
   };
 }
 
@@ -37,6 +38,7 @@ export function StockTable({ stock }: StockTableProps) {
             <TableHead>Product</TableHead>
             <TableHead>SKU</TableHead>
             <TableHead>Location</TableHead>
+            <TableHead>Type</TableHead>
             <TableHead className="text-right">Quantity</TableHead>
           </TableRow>
         </TableHeader>
@@ -44,10 +46,10 @@ export function StockTable({ stock }: StockTableProps) {
           {stock.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={4}
+                colSpan={5}
                 className="text-center text-muted-foreground"
               >
-                No stock found in internal locations.
+                No stock found.
               </TableCell>
             </TableRow>
           ) : (
@@ -61,6 +63,9 @@ export function StockTable({ stock }: StockTableProps) {
                   <Badge variant="outline">
                     {item.location.name} ({item.location.shortCode})
                   </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="secondary">{item.location.type}</Badge>
                 </TableCell>
                 <TableCell className="text-right">
                   <span

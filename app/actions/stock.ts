@@ -38,9 +38,6 @@ export async function getCurrentStock() {
             where: {
                 quantity: {
                     not: 0
-                },
-                location: {
-                    type: 'INTERNAL'
                 }
             },
             include: {
