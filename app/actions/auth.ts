@@ -4,6 +4,7 @@ import { z } from 'zod'
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 import nodemailer from 'nodemailer'
 
 const signUpSchema = z.object({
@@ -119,11 +120,13 @@ export async function signIn(prevState: any, formData: FormData) {
     }
 
     console.log("Redirecting to dashboard...")
+    revalidatePath('/dashboard')
     redirect('/dashboard')
 }
 
 export async function signOut() {
     await deleteSession()
+    revalidatePath('/dashboard')
     redirect('/sign-in')
 }
 
