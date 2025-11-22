@@ -94,7 +94,7 @@ export function OperationCard({
       <CardContent className="relative z-10">
         <div className="flex items-start justify-between gap-4">
           {/* Main Action Button */}
-          <Link href={`₹{href}?status=ready` as any} className="flex-1">
+          <Link href={`${href}?status=ready` as any} className="flex-1">
             <Button
               className={cn(
                 "w-full h-auto flex-col items-start px-6 py-4 text-white rounded-xl shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl",
@@ -115,7 +115,7 @@ export function OperationCard({
           <div className="flex flex-col gap-3">
             {/* Late Status */}
             <Link
-              href={`₹{href}?status=late` as any}
+              href={`${href}?status=late` as any}
               className={cn(
                 "group/item flex items-center gap-2 rounded-lg px-3 py-2 transition-all duration-300 hover:scale-105",
                 stats.late > 0
@@ -144,7 +144,7 @@ export function OperationCard({
 
             {/* Waiting Status */}
             <Link
-              href={`₹{href}?status=waiting` as any}
+              href={`${href}?status=waiting` as any}
               className="group/item flex items-center gap-2 rounded-lg px-3 py-2 bg-muted/50 hover:bg-muted transition-all duration-300 hover:scale-105"
             >
               <Clock className="h-4 w-4 text-muted-foreground" />

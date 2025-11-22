@@ -50,7 +50,7 @@ export function ReceiptView({ transfer }: ReceiptViewProps) {
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
       pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-      pdf.save(`₹{transfer.reference}.pdf`);
+      pdf.save(`${transfer.reference}.pdf`);
     } catch (error) {
       console.error("Error generating PDF:", error);
     } finally {

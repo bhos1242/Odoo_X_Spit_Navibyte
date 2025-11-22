@@ -146,7 +146,7 @@ function BarsLoader({ size }: { size: string }) {
             "rounded-full bg-linear-to-t from-primary to-purple-600 animate-bar-scale origin-bottom"
           )}
           style={{
-            animationDelay: `₹{i * 0.1}s`,
+            animationDelay: `${i * 0.1}s`,
           }}
         />
       ))}

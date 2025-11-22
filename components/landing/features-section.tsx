@@ -166,7 +166,7 @@ function FeatureCard({
   return (
     <Card
       className="group relative overflow-hidden border border-border/50 bg-background/50 backdrop-blur-sm transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2 hover:border-primary/30 animate-fade-in-up"
-      style={{ animationDelay: `₹{index * 0.1}s` }}
+      style={{ animationDelay: `${index * 0.1}s` }}
     >
       {/* Gradient Overlay on Hover */}
       <div
