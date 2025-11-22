@@ -11,6 +11,9 @@
     "clean": "npx rimraf node_modules .next pnpm-lock.yaml && pnpm install",
     "postinstall": "prisma generate"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@prisma/client": "6.3.0",
