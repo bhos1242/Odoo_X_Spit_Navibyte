@@ -19,7 +19,10 @@ import {
   Globe,
 } from "lucide-react";
 
-export default function Home() {
+import { getSession } from "@/lib/session";
+
+export default async function Home() {
+  const session = await getSession();
   return (
     <div className="flex min-h-screen flex-col bg-background">
       {/* Header */}
@@ -50,16 +53,32 @@ export default function Home() {
             >
               About
             </Link>
+            {session && (
+              <Link
+                href="/dashboard"
+                className="hover:text-foreground transition-colors font-semibold text-primary"
+              >
+                Dashboard
+              </Link>
+            )}
           </nav>
           <div className="flex items-center gap-4">
-            <Link href="/sign-in">
-              <Button variant="ghost" size="sm">
-                Sign In
-              </Button>
-            </Link>
-            <Link href="/dashboard">
-              <Button size="sm">Get Started</Button>
-            </Link>
+            {session ? (
+              <Link href="/dashboard">
+                <Button size="sm">Go to Dashboard</Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/sign-in">
+                  <Button variant="ghost" size="sm">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/dashboard">
+                  <Button size="sm">Get Started</Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -93,7 +112,8 @@ export default function Home() {
                   size="lg"
                   className="w-full sm:w-auto gap-2 h-12 px-8 text-base"
                 >
-                  Get Started Now <ArrowRight className="h-4 w-4" />
+                  {session ? "Go to Dashboard" : "Get Started Now"}{" "}
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
               <Link href="#features">
@@ -183,7 +203,7 @@ export default function Home() {
               </p>
               <Link href="/dashboard">
                 <Button size="lg" className="h-12 px-8 text-base">
-                  Start Your Free Trial
+                  {session ? "Go to Dashboard" : "Start Your Free Trial"}
                 </Button>
               </Link>
             </div>
