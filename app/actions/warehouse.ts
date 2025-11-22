@@ -72,15 +72,15 @@ export async function deleteWarehouse(id: string) {
         })
 
         if (warehouse && warehouse.locations.length > 0) {
-             // In a real app, we might want to force delete or ask user.
-             // For now, let's allow it but maybe we should have warned?
-             // Actually, the user said "tell user to delete ware house first" when deleting LOCATION.
-             // So deleting warehouse is the "master" action.
-             // But usually we don't want to orphan locations or delete them implicitly if they have stock.
-             // Let's just delete the warehouse and let Prisma handle relations (SetNull or Cascade).
-             // Schema says: locations Location[]
-             // Location has warehouseId String?
-             // Default is SetNull usually if not specified.
+            // In a real app, we might want to force delete or ask user.
+            // For now, let's allow it but maybe we should have warned?
+            // Actually, the user said "tell user to delete ware house first" when deleting LOCATION.
+            // So deleting warehouse is the "master" action.
+            // But usually we don't want to orphan locations or delete them implicitly if they have stock.
+            // Let's just delete the warehouse and let Prisma handle relations (SetNull or Cascade).
+            // Schema says: locations Location[]
+            // Location has warehouseId String?
+            // Default is SetNull usually if not specified.
         }
 
         await prisma.warehouse.delete({
@@ -176,12 +176,12 @@ export async function deleteLocation(id: string) {
         })
 
         if (location?.warehouseId) {
-             // User requirement: "don't delete location directly tell user to delete ware house first"
-             // This is a weird requirement, but I will implement it as requested.
-             return { 
-                 success: false, 
-                 error: `Cannot delete location directly. Please delete the Warehouse "${location.warehouse?.name}" first.` 
-             }
+            // User requirement: "don't delete location directly tell user to delete ware house first"
+            // This is a weird requirement, but I will implement it as requested.
+            return {
+                success: false,
+                error: `Cannot delete location directly. Please delete the Warehouse "${location.warehouse?.name}" first.`
+            }
         }
 
         await prisma.location.delete({
