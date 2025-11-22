@@ -104,19 +104,30 @@ export function TransferList({ transfers, type }: TransferListProps) {
           <TableBody>
             {transfers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground">
+                <TableCell
+                  colSpan={6}
+                  className="text-center text-muted-foreground"
+                >
                   No transfers found.
                 </TableCell>
               </TableRow>
             ) : (
               transfers.map((transfer) => (
                 <TableRow key={transfer.id}>
-                  <TableCell className="font-medium">{transfer.reference}</TableCell>
+                  <TableCell className="font-medium">
+                    {transfer.reference}
+                  </TableCell>
                   <TableCell>{transfer.contact?.name || "-"}</TableCell>
                   <TableCell>{transfer.sourceLocation?.name || "-"}</TableCell>
-                  <TableCell>{transfer.destinationLocation?.name || "-"}</TableCell>
                   <TableCell>
-                    <Badge variant={transfer.status === "DONE" ? "default" : "secondary"}>
+                    {transfer.destinationLocation?.name || "-"}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        transfer.status === "DONE" ? "default" : "secondary"
+                      }
+                    >
                       {transfer.status}
                     </Badge>
                   </TableCell>
@@ -149,7 +160,10 @@ export function TransferList({ transfers, type }: TransferListProps) {
         </Table>
       </div>
 
-      <AlertDialog open={!!deletingId} onOpenChange={(open) => !open && setDeletingId(null)}>
+      <AlertDialog
+        open={!!deletingId}
+        onOpenChange={(open) => !open && setDeletingId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Transfer?</AlertDialogTitle>
@@ -166,7 +180,10 @@ export function TransferList({ transfers, type }: TransferListProps) {
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={!!validatingId} onOpenChange={(open) => !open && setValidatingId(null)}>
+      <AlertDialog
+        open={!!validatingId}
+        onOpenChange={(open) => !open && setValidatingId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Validate Transfer?</AlertDialogTitle>

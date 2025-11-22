@@ -70,7 +70,9 @@ export function TransferDialog({
   const { data: contacts = [] } = useQuery({
     queryKey: ["contacts", type === "INCOMING" ? "VENDOR" : "CUSTOMER"],
     queryFn: async () => {
-      const res = await getContacts(type === "INCOMING" ? "VENDOR" : "CUSTOMER");
+      const res = await getContacts(
+        type === "INCOMING" ? "VENDOR" : "CUSTOMER"
+      );
       return res.success ? res.data : [];
     },
     enabled: isOpen,
@@ -118,7 +120,11 @@ export function TransferDialog({
         toast.success("Transfer created");
         queryClient.invalidateQueries({ queryKey: ["transfers", type] });
       } else {
-        toast.error(typeof result.error === "string" ? result.error : "Failed to create transfer");
+        toast.error(
+          typeof result.error === "string"
+            ? result.error
+            : "Failed to create transfer"
+        );
       }
     },
     onError: () => {
@@ -172,7 +178,10 @@ export function TransferDialog({
                     <FormLabel>
                       {type === "INCOMING" ? "Vendor" : "Customer"}
                     </FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select contact" />
@@ -199,7 +208,10 @@ export function TransferDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Source Location</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select source" />
@@ -223,7 +235,10 @@ export function TransferDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Destination Location</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select destination" />
@@ -256,7 +271,7 @@ export function TransferDialog({
                   Add Item
                 </Button>
               </div>
-              
+
               {fields.map((field, index) => (
                 <div key={field.id} className="flex items-end gap-2">
                   <FormField
@@ -264,7 +279,10 @@ export function TransferDialog({
                     name={`items.${index}.productId`}
                     render={({ field }) => (
                       <FormItem className="flex-1">
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select product" />

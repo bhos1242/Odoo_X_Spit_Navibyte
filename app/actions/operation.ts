@@ -35,7 +35,20 @@ export async function getTransfers(type: TransferType) {
             },
             orderBy: { createdAt: 'desc' }
         })
-        return { success: true, data: transfers }
+
+        const serializedTransfers = transfers.map(transfer => ({
+            ...transfer,
+            stockMoves: transfer.stockMoves.map(move => ({
+                ...move,
+                product: {
+                    ...move.product,
+                    costPrice: Number(move.product.costPrice),
+                    salesPrice: Number(move.product.salesPrice)
+                }
+            }))
+        }))
+
+        return { success: true, data: serializedTransfers }
     } catch (error) {
         return { success: false, error: 'Failed to fetch transfers' }
     }
@@ -112,7 +125,7 @@ export async function validateTransfer(id: string) {
             // 1. Update Transfer Status
             await tx.stockTransfer.update({
                 where: { id },
-                data: { 
+                data: {
                     status: 'DONE',
                     effectiveDate: new Date()
                 }
