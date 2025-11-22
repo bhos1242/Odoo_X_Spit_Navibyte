@@ -67,7 +67,7 @@ export function MovesTable({ moves }: MovesTableProps) {
             moves.map((move) => {
               const isIncoming = move.transfer?.type === "INCOMING";
               const isOutgoing = move.transfer?.type === "OUTGOING";
-              
+
               return (
                 <TableRow key={move.id}>
                   <TableCell className="font-medium">
@@ -76,23 +76,23 @@ export function MovesTable({ moves }: MovesTableProps) {
                   <TableCell>
                     {format(new Date(move.createdAt), "MMM d, yyyy")}
                   </TableCell>
-                  <TableCell>
-                    {move.transfer?.contact?.name || "-"}
-                  </TableCell>
-                  <TableCell className={cn(
-                    isIncoming && "text-green-600 font-medium"
-                  )}>
+                  <TableCell>{move.transfer?.contact?.name || "-"}</TableCell>
+                  <TableCell
+                    className={cn(isIncoming && "text-green-600 font-medium")}
+                  >
                     {move.sourceLocation?.name || "-"}
                   </TableCell>
-                  <TableCell className={cn(
-                    isOutgoing && "text-red-600 font-medium"
-                  )}>
+                  <TableCell
+                    className={cn(isOutgoing && "text-red-600 font-medium")}
+                  >
                     {move.destinationLocation?.name || "-"}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex flex-col items-end">
                       <span>{move.quantity}</span>
-                      <span className="text-xs text-muted-foreground">{move.product.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {move.product.name}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell>
