@@ -13,7 +13,6 @@ function InputOTP({
 }: React.ComponentProps<typeof OTPInput> & {
   containerClassName?: string;
 }) {
-  console.log("DEBUG: InputOTP Internal Props", props);
   return (
     <OTPInput
       data-slot="input-otp"

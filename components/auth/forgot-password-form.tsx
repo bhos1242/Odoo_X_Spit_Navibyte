@@ -11,7 +11,6 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { REGEXP_ONLY_DIGITS } from "input-otp";
 import {
   Card,
   CardContent,
@@ -180,18 +179,7 @@ export function ForgotPasswordForm() {
                   <FormItem>
                     <FormLabel>OTP</FormLabel>
                     <FormControl>
-                      <InputOTP
-                        maxLength={4}
-                        pattern={REGEXP_ONLY_DIGITS}
-                        autoFocus
-                        {...field}
-                        onChange={(value) => {
-                          console.log("DEBUG: OTP onChange", value);
-                          field.onChange(value);
-                        }}
-                        onFocus={() => console.log("DEBUG: OTP onFocus")}
-                        onClick={() => console.log("DEBUG: OTP onClick")}
-                      >
+                      <InputOTP maxLength={4} {...field}>
                         <InputOTPGroup>
                           <InputOTPSlot index={0} />
                           <InputOTPSlot index={1} />
