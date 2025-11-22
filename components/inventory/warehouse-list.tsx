@@ -40,7 +40,9 @@ interface Warehouse {
 }
 
 export function WarehouseList({ warehouses }: { warehouses: Warehouse[] }) {
-  const [editingWarehouse, setEditingWarehouse] = useState<Warehouse | null>(null);
+  const [editingWarehouse, setEditingWarehouse] = useState<Warehouse | null>(
+    null
+  );
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDelete = async () => {
@@ -84,11 +86,13 @@ export function WarehouseList({ warehouses }: { warehouses: Warehouse[] }) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => setEditingWarehouse(warehouse)}>
+                      <DropdownMenuItem
+                        onClick={() => setEditingWarehouse(warehouse)}
+                      >
                         <Pencil className="mr-2 h-4 w-4" />
                         Edit
                       </DropdownMenuItem>
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         className="text-red-600"
                         onClick={() => setDeletingId(warehouse.id)}
                       >
@@ -114,23 +118,30 @@ export function WarehouseList({ warehouses }: { warehouses: Warehouse[] }) {
         ))}
       </div>
 
-      <WarehouseDialog 
-        open={!!editingWarehouse} 
+      <WarehouseDialog
+        open={!!editingWarehouse}
         onOpenChange={(open) => !open && setEditingWarehouse(null)}
         warehouseToEdit={editingWarehouse}
       />
 
-      <AlertDialog open={!!deletingId} onOpenChange={(open) => !open && setDeletingId(null)}>
+      <AlertDialog
+        open={!!deletingId}
+        onOpenChange={(open) => !open && setDeletingId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the warehouse.
+              This action cannot be undone. This will permanently delete the
+              warehouse.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
