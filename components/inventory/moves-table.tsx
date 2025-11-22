@@ -11,6 +11,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 
+import { cn } from "@/lib/utils";
+
 interface StockMove {
   id: string;
   createdAt: Date;
@@ -28,6 +30,10 @@ interface StockMove {
   status: string;
   transfer?: {
     reference: string;
+    type: string;
+    contact?: {
+      name: string;
+    } | null;
   } | null;
 }
 
@@ -41,9 +47,9 @@ export function MovesTable({ moves }: MovesTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Date</TableHead>
             <TableHead>Reference</TableHead>
-            <TableHead>Product</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Contact</TableHead>
             <TableHead>From</TableHead>
             <TableHead>To</TableHead>
             <TableHead className="text-right">Quantity</TableHead>
@@ -58,30 +64,43 @@ export function MovesTable({ moves }: MovesTableProps) {
               </TableCell>
             </TableRow>
           ) : (
-            moves.map((move) => (
-              <TableRow key={move.id}>
-                <TableCell>
-                  {format(new Date(move.createdAt), "MMM d, yyyy HH:mm")}
-                </TableCell>
-                <TableCell className="font-medium">
-                  {move.transfer?.reference || "-"}
-                </TableCell>
-                <TableCell>
-                  <div className="flex flex-col">
-                    <span className="font-medium">{move.product.name}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {move.product.sku}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell>{move.sourceLocation?.name || "-"}</TableCell>
-                <TableCell>{move.destinationLocation?.name || "-"}</TableCell>
-                <TableCell className="text-right">{move.quantity}</TableCell>
-                <TableCell>
-                  <Badge variant="outline">{move.status}</Badge>
-                </TableCell>
-              </TableRow>
-            ))
+            moves.map((move) => {
+              const isIncoming = move.transfer?.type === "INCOMING";
+              const isOutgoing = move.transfer?.type === "OUTGOING";
+              
+              return (
+                <TableRow key={move.id}>
+                  <TableCell className="font-medium">
+                    {move.transfer?.reference || "-"}
+                  </TableCell>
+                  <TableCell>
+                    {format(new Date(move.createdAt), "MMM d, yyyy")}
+                  </TableCell>
+                  <TableCell>
+                    {move.transfer?.contact?.name || "-"}
+                  </TableCell>
+                  <TableCell className={cn(
+                    isIncoming && "text-green-600 font-medium"
+                  )}>
+                    {move.sourceLocation?.name || "-"}
+                  </TableCell>
+                  <TableCell className={cn(
+                    isOutgoing && "text-red-600 font-medium"
+                  )}>
+                    {move.destinationLocation?.name || "-"}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex flex-col items-end">
+                      <span>{move.quantity}</span>
+                      <span className="text-xs text-muted-foreground">{move.product.name}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{move.status}</Badge>
+                  </TableCell>
+                </TableRow>
+              );
+            })
           )}
         </TableBody>
       </Table>
