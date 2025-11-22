@@ -282,7 +282,9 @@ export function LocationDialog({
               )}
             />
             <DialogFooter>
-              <Button type="submit">Create Location</Button>
+              <Button type="submit">
+                {locationToEdit ? "Update Location" : "Create Location"}
+              </Button>
             </DialogFooter>
           </form>
         </Form>
