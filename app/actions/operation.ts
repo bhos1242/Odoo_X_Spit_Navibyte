@@ -19,10 +19,11 @@ const transferSchema = z.object({
     items: z.array(moveSchema).min(1, "At least one product is required"),
 })
 
-export async function getTransfers(type: TransferType) {
+export async function getTransfers(type?: TransferType) {
     try {
+        const where = type ? { type } : {}
         const transfers = await prisma.stockTransfer.findMany({
-            where: { type },
+            where,
             include: {
                 contact: true,
                 sourceLocation: true,

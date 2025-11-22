@@ -45,7 +45,7 @@ interface Transfer {
 
 interface TransferListProps {
   transfers: Transfer[];
-  type: "INCOMING" | "OUTGOING" | "INTERNAL" | "ADJUSTMENT";
+  type?: "INCOMING" | "OUTGOING" | "INTERNAL" | "ADJUSTMENT";
 }
 
 export function TransferList({
@@ -57,8 +57,9 @@ export function TransferList({
   const queryClient = useQueryClient();
 
   const { data: transfers = [] } = useQuery({
-    queryKey: ["transfers", type],
+    queryKey: ["transfers", type || "ALL"],
     queryFn: async () => {
+      // @ts-ignore
       const res = await getTransfers(type);
       if (!res.success) throw new Error(res.error as string);
       return res.data as Transfer[];
