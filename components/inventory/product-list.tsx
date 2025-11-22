@@ -121,16 +121,18 @@ export function ProductList({ products: initialProducts }: ProductListProps) {
             ) : (
               products.map((product) => {
                 const totalStock = product.stockLevels.reduce((acc, curr) => {
-                  if (curr.location?.type === "INTERNAL") {
+                  // Ensure we match INTERNAL regardless of case or whitespace
+                  const type = curr.location?.type?.toString().toUpperCase().trim();
+                  if (type === "INTERNAL") {
                     return acc + curr.quantity;
                   }
                   return acc;
                 }, 0);
 
                 const stockBreakdown = product.stockLevels.map((sl) => ({
-                  name: sl.location?.name || "Unknown",
-                  type: sl.location?.type || "Unknown",
-                  qty: sl.quantity,
+                    name: sl.location?.name || "Unknown",
+                    type: sl.location?.type || "Unknown",
+                    qty: sl.quantity
                 }));
 
                 return (

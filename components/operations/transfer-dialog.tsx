@@ -147,6 +147,40 @@ export function TransferDialog({
   });
 
   const onSubmit = (values: z.infer<typeof transferSchema>) => {
+    // Manual validation based on type
+    if (type === "INCOMING" && !values.destinationLocationId) {
+      form.setError("destinationLocationId", {
+        type: "manual",
+        message: "Destination location is required for receipts",
+      });
+      return;
+    }
+    if (type === "OUTGOING" && !values.sourceLocationId) {
+      form.setError("sourceLocationId", {
+        type: "manual",
+        message: "Source location is required for deliveries",
+      });
+      return;
+    }
+    if (type === "INTERNAL") {
+      let hasError = false;
+      if (!values.sourceLocationId) {
+        form.setError("sourceLocationId", {
+          type: "manual",
+          message: "Source location is required",
+        });
+        hasError = true;
+      }
+      if (!values.destinationLocationId) {
+        form.setError("destinationLocationId", {
+          type: "manual",
+          message: "Destination location is required",
+        });
+        hasError = true;
+      }
+      if (hasError) return;
+    }
+
     // Sanitize optional fields
     const data = {
       ...values,
