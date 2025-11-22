@@ -153,9 +153,11 @@ export function TransferList({
                 <TableRow key={transfer.id}>
                   <TableCell className="font-medium">
                     <Link
-                      href={`/dashboard/operations/${getLinkPath(
-                        transfer.type
-                      )}/${transfer.id}`}
+                      href={
+                        `/dashboard/operations/${getLinkPath(transfer.type)}/${
+                          transfer.id
+                        }` as any
+                      }
                       className="hover:underline text-primary"
                     >
                       {transfer.reference}
