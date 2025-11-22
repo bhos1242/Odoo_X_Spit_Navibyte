@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Box } from "lucide-react";
-import { Session } from "next-auth"; // Assuming next-auth types, or I can use any if not strict
 
 interface SiteHeaderProps {
   session: any; // Using any for now to avoid type issues if Session type isn't readily available in context
@@ -62,7 +61,10 @@ export function SiteHeader({ session }: SiteHeaderProps) {
                 </Button>
               </Link>
               <Link href="/sign-up">
-                <Button size="sm" className="rounded-full px-6 shadow-lg shadow-primary/20">
+                <Button
+                  size="sm"
+                  className="rounded-full px-6 shadow-lg shadow-primary/20"
+                >
                   Get Started
                 </Button>
               </Link>
