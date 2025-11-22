@@ -278,7 +278,9 @@ export function TransferDialog({
             {/* Products Section */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <FormLabel className="text-base font-semibold">Products</FormLabel>
+                <FormLabel className="text-base font-semibold">
+                  Products
+                </FormLabel>
                 <Button
                   type="button"
                   variant="outline"
@@ -292,13 +294,18 @@ export function TransferDialog({
 
               <div className="space-y-4">
                 {fields.map((field, index) => (
-                  <div key={field.id} className="flex items-start gap-4 p-4 border rounded-lg bg-muted/20">
+                  <div
+                    key={field.id}
+                    className="flex items-start gap-4 p-4 border rounded-lg bg-muted/20"
+                  >
                     <FormField
                       control={form.control}
                       name={`items.${index}.productId`}
                       render={({ field }) => (
                         <FormItem className="flex-1">
-                          <FormLabel className={index !== 0 ? "sr-only" : ""}>Product</FormLabel>
+                          <FormLabel className={index !== 0 ? "sr-only" : ""}>
+                            Product
+                          </FormLabel>
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
@@ -325,7 +332,9 @@ export function TransferDialog({
                       name={`items.${index}.quantity`}
                       render={({ field }) => (
                         <FormItem className="w-32">
-                          <FormLabel className={index !== 0 ? "sr-only" : ""}>Quantity</FormLabel>
+                          <FormLabel className={index !== 0 ? "sr-only" : ""}>
+                            Quantity
+                          </FormLabel>
                           <FormControl>
                             <Input
                               type="number"
@@ -357,7 +366,9 @@ export function TransferDialog({
             </div>
 
             <DialogFooter>
-              <Button type="submit" className="w-full sm:w-auto">Create Transfer</Button>
+              <Button type="submit" className="w-full sm:w-auto">
+                Create Transfer
+              </Button>
             </DialogFooter>
           </form>
         </Form>
