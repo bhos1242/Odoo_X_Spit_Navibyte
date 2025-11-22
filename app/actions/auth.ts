@@ -81,13 +81,13 @@ export async function signUp(data: z.infer<typeof signUpSchema>) {
 import { createSession, deleteSession } from '@/lib/session'
 
 const signInSchema = z.object({
-    email: z.string().email('Invalid email address'),
+    identifier: z.string().min(1, 'Email or Login ID is required'),
     password: z.string().min(1, 'Password is required'),
 })
 
 export async function signIn(prevState: any, formData: FormData) {
     const validatedFields = signInSchema.safeParse({
-        email: formData.get('email'),
+        identifier: formData.get('identifier'),
         password: formData.get('password'),
     })
 
@@ -97,11 +97,16 @@ export async function signIn(prevState: any, formData: FormData) {
         }
     }
 
-    const { email, password } = validatedFields.data
+    const { identifier, password } = validatedFields.data
 
     try {
-        const user = await prisma.user.findUnique({
-            where: { email },
+        // Check if identifier is an email or Login ID
+        const isEmail = identifier.includes('@')
+
+        const user = await prisma.user.findFirst({
+            where: isEmail
+                ? { email: identifier }
+                : { name: identifier }
         })
 
         if (!user) {
