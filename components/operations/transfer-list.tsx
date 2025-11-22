@@ -12,7 +12,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { Check, Trash2, Calendar, Package } from "lucide-react";
-import { deleteTransfer, validateTransfer, getTransfers } from "@/app/actions/operation";
+import {
+  deleteTransfer,
+  validateTransfer,
+  getTransfers,
+} from "@/app/actions/operation";
 import toast from "react-hot-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -44,7 +48,10 @@ interface TransferListProps {
   type: "INCOMING" | "OUTGOING" | "INTERNAL" | "ADJUSTMENT";
 }
 
-export function TransferList({ transfers: initialTransfers, type }: TransferListProps) {
+export function TransferList({
+  transfers: initialTransfers,
+  type,
+}: TransferListProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [validatingId, setValidatingId] = useState<string | null>(null);
   const queryClient = useQueryClient();
