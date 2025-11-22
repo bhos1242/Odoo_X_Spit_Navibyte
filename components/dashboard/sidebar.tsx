@@ -17,6 +17,9 @@ import {
   Container,
   MapPin,
   Tags,
+  ShoppingCart,
+  ArrowDownToLine,
+  ArrowUpFromLine,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -37,12 +40,12 @@ const sidebarGroups = [
       {
         title: "Receipts",
         href: "/dashboard/operations/receipts",
-        icon: Container,
+        icon: ArrowDownToLine,
       },
       {
         title: "Deliveries",
         href: "/dashboard/operations/deliveries",
-        icon: Truck,
+        icon: ArrowUpFromLine,
       },
       {
         title: "All Operations",
@@ -103,6 +106,16 @@ const sidebarGroups = [
         title: "Settings",
         href: "/dashboard/settings",
         icon: Settings,
+      },
+    ],
+  },
+  {
+    title: "Contacts",
+    items: [
+      {
+        title: "Contacts",
+        href: "/dashboard/contacts",
+        icon: Users,
       },
     ],
   },
